@@ -14,9 +14,9 @@ def mapping(url, *querystring):
 
 
 params = {
-    'affiliate': 'false',
-    'origin_iata': 'MOW',
-    'destination_iata': 'ROM',
+    'currency': 'usd',
+    'period_type': 'year',
+    'year': '30',
     'depart_month': '2020-03-01'
 }
 
@@ -46,6 +46,12 @@ def calculus(json, _min, _max):
             else:
                 print(item)
 
+def get_IATA_list():
+    return requests\
+        .get('http://api.travelpayouts.com/data/ru/cities.json')\
+        .json()
+
 
 if __name__ == "__main__":
-    print(calculus(mapping('https://lyssa.aviasales.ru/date_picker_prices', params), 4, 14))
+    for i in get_IATA_list():
+        print(i)
