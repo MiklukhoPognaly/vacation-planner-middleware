@@ -1,4 +1,7 @@
-/venv
+#directories
+.idea
+vacation_planner/
+venv/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -6,7 +9,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+*.iml
 # Distribution / packaging
 .Python
 build/
