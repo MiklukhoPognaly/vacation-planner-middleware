@@ -1,5 +1,6 @@
 import requests
 import datefinder
+import unittest
 
 def get_json_raw(url, *querystring):
     _r = requests.get(url, *querystring)
@@ -46,12 +47,43 @@ def calculus(json, _min, _max):
             else:
                 print(item)
 
-def get_IATA_list():
+class BaseCityClass():
+    def __init__(self, city_IATA_dict):
+        self._city_IATA_dict = city_IATA_dict
+
+    def get_name(self):
+        return self._city_IATA_dict['name']
+
+    def get_tzone(self):
+        return self._city_IATA_dict['time_zone']
+
+    def get_IATA(self):
+        return self._city_IATA_dict['code']
+
+    def get_coordinates(self):
+        return self._city_IATA_dict['coordinates']
+
+    def get_name_translations(self):
+        return self._city_IATA_dict['name_translations']
+
+    def get_cases(self):
+        return self._city_IATA_dict['cases']
+
+    def get_country_code(self):
+        return self._city_IATA_dict['country_code']
+
+
+
+
+def get_IATA_list(url):
     return requests\
-        .get('http://api.travelpayouts.com/data/ru/cities.json')\
+        .get(url)\
         .json()
 
+def IATA_list_parser(IATA_json):
+    for city_params_dict in IATA_json:
+        city = BaseCityClass(city_params_dict)
+        print(city.get_name(), city.get_IATA(), city.get_tzone(), city.get_coordinates())
 
 if __name__ == "__main__":
-    for i in get_IATA_list():
-        print(i)
+    IATA_list_parser(get_IATA_list())
