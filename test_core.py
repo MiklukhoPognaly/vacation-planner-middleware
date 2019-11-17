@@ -1,4 +1,5 @@
 # coding=utf-8
+import api_facade.data_cities
 import core
 import unittest
 from api_facade.map_aviasales import BaseSupportedDirections
@@ -44,7 +45,7 @@ _test_data_supported_directions = {
 
 class TestIATABaseClass(unittest.TestCase):
     def setUp(self):
-        self._result = core.BaseCityClass(_test_data_IATA_CITIES)
+        self._result = api_facade.data_cities.BaseCityClass(_test_data_IATA_CITIES)
 
     def test_name(self):
         assert self._result.get_name() == 'Тест'
