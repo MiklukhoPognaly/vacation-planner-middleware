@@ -1,7 +1,7 @@
 # coding=utf-8
 import core
 import unittest
-from core import BaseSupportedDirections
+from api_facade.map_aviasales import BaseSupportedDirections
 
 def test_get_IATA_list():
     result = core.get_IATA_list('http://api.travelpayouts.com/data/ru/cities.json')
