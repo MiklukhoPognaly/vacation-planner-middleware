@@ -1,6 +1,7 @@
 # coding=utf-8
 import core
 import unittest
+from core import BaseSupportedDirections
 
 def test_get_IATA_list():
     result = core.get_IATA_list('http://api.travelpayouts.com/data/ru/cities.json')
@@ -67,22 +68,12 @@ class TestIATABaseClass(unittest.TestCase):
         assert self._result.get_country_code() == 'test'
 
 
-class TestBaseSupportedDirections():
+class TestBaseSupportedDirections(unittest.TestCase):
     def setUp(self):
-        self._result = core.BaseSupportedDirections(_test_data_supported_directions)
-
-    def test_get_origin(self):
-        assert self._result.get_origin() == {
-            "iata": "LED",
-            "name": "Санкт-Петербург",
-            "country": "RU",
-            "coordinates": [30.315785, 59.939039]
-        }
+        self._result = BaseSupportedDirections(_test_data_supported_directions)
 
     def test_get_origin_iata(self):
-        assert self._result\
-                   .get_origin()\
-                   .get_iata() == "LED"
+        assert self._result.get_origin().get_iata() == "LED"
 
     def test_get_origin_name(self):
         assert self._result\
