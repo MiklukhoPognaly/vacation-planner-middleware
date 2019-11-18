@@ -4,11 +4,12 @@ from datetime import datetime
 import core
 import api_facade.data_cities
 import api_facade.min_prices_aviasales
+import utils.http_requests
 from api_facade.map_aviasales import BaseSupportedDirections
-
+import utils.http_requests
 
 def test_get_IATA_list():
-    result = core.get_IATA_list('http://api.travelpayouts.com/data/ru/cities.json')
+    result = utils.http_requests.get_json('http://api.travelpayouts.com/data/ru/cities.json')
     assert isinstance(result, (type([])))
 
 
@@ -173,3 +174,17 @@ class TestBestPrices(unittest.TestCase):
     def test_best_prices_depart_date(self):
         assert self._result.get_best_prices()[0]\
                    .get_depart_date() == datetime.strptime('2020-04-27', "%Y-%m-%d")
+
+
+class TestGetJson(unittest.TestCase):
+    def setUp(self):
+        self._url = "http://min-prices.aviasales.ru/calendar_preload"
+
+    def test_get_json(self):
+        #origin=MOW&destination=AAQ&depart_date=2019-12-01&one_way=true
+        assert 'best_prices' in utils.http_requests.get_json_raw(self._url, {"origin": "MOW",
+                                                     "destination": "AAQ",
+                                                     "depart_date": "2019-12-01",
+                                                     "one_way": "true"}).keys()
+
+

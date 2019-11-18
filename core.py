@@ -1,13 +1,9 @@
-import requests
 import datefinder
 
 from api_facade.data_cities import BaseCityClass
-
-
-def get_json_raw(url, *querystring):
-    _r = requests.get(url, *querystring)
-    return _r.json()
-
+from utils.http_requests import get_json_raw, get_json
+import utils.http_requests
+import api_facade.min_prices_aviasales
 
 def mapping(url, *querystring):
     _r = get_json_raw(url, *querystring)
@@ -49,16 +45,34 @@ def calculus(json, _min, _max):
             else:
                 print(item)
 
+#todo:использовать асинхронный вызов http
 
-def get_IATA_list(url):
-    return requests\
-        .get(url)\
-        .json()
 
-def IATA_list_parser(IATA_json):
-    for city_params_dict in IATA_json:
-        city = BaseCityClass(city_params_dict)
-        print(city.get_name(), city.get_IATA(), city.get_tzone(), city.get_coordinates())
+
+
+def form_best_prices():
+
+    _cities_iata = utils.http_requests.get_json('http://api.travelpayouts.com/data/ru/cities.json')
+
+    _cities_inst = api_facade.data_cities.BaseCityClass(_cities_iata)
+
+    print(_cities_inst.get_name())
+
+    _raw_json = utils.http_requests.get_json_raw(
+        'http://min-prices.aviasales.ru/calendar_preload',
+                {
+                    "origin": "MOW",
+                    "destination": "AAQ",
+                    "depart_date": "2019-12-01",
+                    "one_way": "true"
+                }
+    )
+
+    inst = api_facade.min_prices_aviasales.BaseCalendarPreload(_raw_json)
+
+    for price in inst.get_best_prices():
+        print(price.get_depart_date(), price.get_return_date(), price.get_value())
+
 
 if __name__ == "__main__":
-    IATA_list_parser(get_IATA_list())
+    form_best_prices()
