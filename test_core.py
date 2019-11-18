@@ -13,7 +13,7 @@ def test_get_IATA_list():
     assert isinstance(result, (type([])))
 
 
-_test_data_IATA_CITIES = {
+_test_data_IATA_CITIES = [{
     'name': 'Тест',
     'time_zone': 'test',
     'code': 'test',
@@ -21,7 +21,7 @@ _test_data_IATA_CITIES = {
     'coordinates': {"lon": "000", "lat": "000"},
     'country_code': 'test',
     'name_translations': {"en": "test"},
-}
+}]
 
 _test_data_supported_directions = {
 
@@ -50,7 +50,8 @@ _test_data_supported_directions = {
 
 class TestIATABaseClass(unittest.TestCase):
     def setUp(self):
-        self._result = api_facade.data_cities.BaseCityClass(_test_data_IATA_CITIES)
+        self._result = api_facade.data_cities.BaseCityClass(_test_data_IATA_CITIES).get_iata()[-1]
+
 
     def test_name(self):
         assert self._result.get_name() == 'Тест'

@@ -54,15 +54,16 @@ def form_best_prices():
 
     _cities_iata = utils.http_requests.get_json('http://api.travelpayouts.com/data/ru/cities.json')
 
-    _cities_inst = api_facade.data_cities.BaseCityClass(_cities_iata)
+    _cities_iata_1 = api_facade.data_cities.BaseCityClass(_cities_iata).get_iata()[4]
+    _cities_iata_2 = api_facade.data_cities.BaseCityClass(_cities_iata).get_iata()[-1]
 
-    print(_cities_inst.get_name())
+
 
     _raw_json = utils.http_requests.get_json_raw(
         'http://min-prices.aviasales.ru/calendar_preload',
                 {
                     "origin": "MOW",
-                    "destination": "AAQ",
+                    "destination": _cities_iata_2.get_IATA(),
                     "depart_date": "2019-12-01",
                     "one_way": "true"
                 }
