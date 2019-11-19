@@ -189,3 +189,14 @@ class TestGetJson(unittest.TestCase):
                                                      "one_way": "true"}).keys()
 
 
+class TestErrorDecorator(unittest.TestCase):
+    def test_error_http(self):
+        with self.assertRaises(Exception):
+            utils.http_requests.get_json_raw('http://min-prices.aviasales.ru/calendar_preload',
+                                                           {
+                                                                "origin": "MOW",
+                                                                "destination": "WWW",
+                                                                "depart_date": "2019-12-01",
+                                                                "one_way": "true"
+                                                           })
+

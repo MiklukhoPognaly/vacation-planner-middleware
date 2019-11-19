@@ -55,7 +55,7 @@ def form_best_prices():
     _cities_iata = utils.http_requests.get_json('http://api.travelpayouts.com/data/ru/cities.json')
 
     _cities_iata_1 = api_facade.data_cities.BaseCityClass(_cities_iata).get_iata()[4]
-    _cities_iata_2 = api_facade.data_cities.BaseCityClass(_cities_iata).get_iata()[-1]
+    _cities_iata_2 = api_facade.data_cities.BaseCityClass(_cities_iata).get_iata()[56]
 
 
 
@@ -72,7 +72,7 @@ def form_best_prices():
     inst = api_facade.min_prices_aviasales.BaseCalendarPreload(_raw_json)
 
     for price in inst.get_best_prices():
-        print(price.get_depart_date(), price.get_return_date(), price.get_value())
+        print(price.get_origin, price.get_distance, price.get_depart_date(), price.get_return_date(), price.get_value())
 
 
 if __name__ == "__main__":

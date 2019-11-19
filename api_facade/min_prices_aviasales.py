@@ -1,4 +1,6 @@
 from datetime import datetime
+from utils.http_requests import aviasales_api_json_error_decorator
+
 
 class BaseCalendarPreload(object):
     #todo: вынести преобразование формата дат в декоратор.
@@ -49,7 +51,7 @@ class BaseCalendarPreload(object):
         def get_value(self):
             return float(self._raw_data['value'])
 
-
+    @aviasales_api_json_error_decorator
     def get_best_prices(self):
         chunk = []
         for item in self._raw_data['best_prices']:
