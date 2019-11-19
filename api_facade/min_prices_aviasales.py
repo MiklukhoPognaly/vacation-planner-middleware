@@ -10,6 +10,15 @@ class BaseCalendarPreload(object):
     class InternalBestPrices(object):
         def __init__(self, raw_data):
             self._raw_data = raw_data
+            self.distance = self.get_distance()
+            self.gate = self.get_gate()
+            self.number_of_changes = self.get_number_of_changes()
+            self.origin = self.get_origin()
+            self.return_date = self.get_return_date()
+            self.depart_date = self.get_depart_date()
+            self.trip_class = self.get_trip_class()
+            self.value = self.get_value()
+            self.destination = self.get_destination()
 
         def __value_decorator(function_to_decorate):
             def wrapper(self):
@@ -37,7 +46,7 @@ class BaseCalendarPreload(object):
 
         @__value_decorator
         def get_return_date(self):
-            return self._raw_data['return_date']
+            return datetime.strptime(self._raw_data['return_date'], "%Y-%m-%d")
 
         @__value_decorator
         def get_depart_date(self):
@@ -50,6 +59,10 @@ class BaseCalendarPreload(object):
         @__value_decorator
         def get_value(self):
             return float(self._raw_data['value'])
+
+        @__value_decorator
+        def get_destination(self):
+            return self._raw_data['destination']
 
     @aviasales_api_json_error_decorator
     def get_best_prices(self):

@@ -12,24 +12,31 @@ class BaseCityClass(object):
     class InternalIata(object):
         def __init__(self, data):
             self._city_IATA_dict = data
+            self.name = self.__get_name()
+            self.tzone = self.__get_tzone()
+            self.iata = self.__get_iata()
+            self.coordinates = self.__get_coordinates()
+            self.name_translations = self.__get_name_translations()
+            self.cases = self.__get_cases()
+            self.country_code = self.__get_country_code()
 
-        def get_name(self):
+        def __get_name(self):
             return self._city_IATA_dict['name']
 
-        def get_tzone(self):
+        def __get_tzone(self):
             return self._city_IATA_dict['time_zone']
 
-        def get_IATA(self):
+        def __get_iata(self):
             return self._city_IATA_dict['code']
 
-        def get_coordinates(self):
+        def __get_coordinates(self):
             return self._city_IATA_dict['coordinates']
 
-        def get_name_translations(self):
+        def __get_name_translations(self):
             return self._city_IATA_dict['name_translations']
 
-        def get_cases(self):
+        def __get_cases(self):
             return self._city_IATA_dict['cases']
 
-        def get_country_code(self):
+        def __get_country_code(self):
             return self._city_IATA_dict['country_code']

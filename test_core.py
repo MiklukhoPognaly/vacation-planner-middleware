@@ -54,25 +54,25 @@ class TestIATABaseClass(unittest.TestCase):
 
 
     def test_name(self):
-        assert self._result.get_name() == 'Тест'
+        assert self._result.name == 'Тест'
 
     def test_tzone(self):
-        assert self._result.get_tzone() == 'test'
+        assert self._result.tzone == 'test'
 
     def test_IATA(self):
-        assert self._result.get_IATA() == 'test'
+        assert self._result.iata == 'test'
 
     def test_coordinates(self):
-        assert self._result.get_coordinates() == {"lon": "000", "lat": "000"}
+        assert self._result.coordinates == {"lon": "000", "lat": "000"}
 
     def test_cases(self):
-        assert self._result.get_cases() == {"vi": "", "tv": "", "ro": "", "pr": "", "da": ""}
+        assert self._result.cases == {"vi": "", "tv": "", "ro": "", "pr": "", "da": ""}
 
     def test_name_translations(self):
-        assert self._result.get_name_translations() == {"en": "test"}
+        assert self._result.name_translations == {"en": "test"}
 
     def test_country_code(self):
-        assert self._result.get_country_code() == 'test'
+        assert self._result.country_code == 'test'
 
 
 class TestBaseSupportedDirections(unittest.TestCase):
@@ -80,47 +80,47 @@ class TestBaseSupportedDirections(unittest.TestCase):
         self._result = BaseSupportedDirections(_test_data_supported_directions)
 
     def test_get_origin_iata(self):
-        assert self._result.get_origin().get_iata() == "LED"
+        assert self._result.get_origin().iata == "LED"
 
     def test_get_origin_name(self):
         assert self._result \
                    .get_origin() \
-                   .get_name() == "Санкт-Петербург"
+                   .name == "Санкт-Петербург"
 
     def test_get_origin_country(self):
         assert self._result \
                    .get_origin() \
-                   .get_country() == "RU"
+                   .country == "RU"
 
     def test_get_origin_coordinates(self):
         assert self._result \
                    .get_origin() \
-                   .get_coordinates() == [30.315785, 59.939039]
+                   .coordinates == [30.315785, 59.939039]
 
     def test_directions_direct(self):
         assert self._result \
                    .get_directions()[0] \
-                   .get_direct() == 'false'
+                   .direct == 'false'
 
     def test_directions_iata(self):
         assert self._result \
                    .get_directions()[0] \
-                   .get_iata() == 'AAL'
+                   .iata == 'AAL'
 
     def test_directions_name(self):
         assert self._result \
                    .get_directions()[0] \
-                   .get_name() == 'Ольборг'
+                   .name == 'Ольборг'
 
     def test_directions_country(self):
         assert self._result \
                    .get_directions()[0] \
-                   .get_country() == 'DK'
+                   .country == 'DK'
 
     def test_directions_coordinates(self):
         assert self._result \
                    .get_directions()[0] \
-                   .get_coordinates() == [9.917771, 57.028811]
+                   .coordinates == [9.917771, 57.028811]
 
 
 test_best_prices_data = {
@@ -152,29 +152,32 @@ class TestBestPrices(unittest.TestCase):
         self._result = api_facade.min_prices_aviasales.BaseCalendarPreload(test_best_prices_data)
 
     def test_best_prices_value(self):
-        assert self._result.get_best_prices()[0].get_value() == 6787.0
+        assert self._result.get_best_prices()[0].value == 6787.0
 
     def test_best_prices_trip_class(self):
-        assert self._result.get_best_prices()[0].get_trip_class() == 0
+        assert self._result.get_best_prices()[0].trip_class == 0
 
     def test_best_prices_return_date(self):
-        assert self._result.get_best_prices()[0].get_return_date() is None
+        assert self._result.get_best_prices()[0].return_date is None
 
     def test_best_prices_origin(self):
-        assert self._result.get_best_prices()[0].get_origin() == 'MOW'
+        assert self._result.get_best_prices()[0].origin == 'MOW'
+
+    def test_best_prices_destination(self):
+        assert self._result.get_best_prices()[0].destination == 'AAQ'
 
     def test_best_prices_number_of_changes(self):
-        assert self._result.get_best_prices()[0].get_number_of_changes() == 0
+        assert self._result.get_best_prices()[0].number_of_changes == 0
 
     def test_best_prices_gate(self):
-        assert self._result.get_best_prices()[0].get_gate() == "S7"
+        assert self._result.get_best_prices()[0].gate == "S7"
 
     def test_best_prices_distance(self):
-        assert self._result.get_best_prices()[0].get_distance() == 1209
+        assert self._result.get_best_prices()[0].distance == 1209
 
     def test_best_prices_depart_date(self):
         assert self._result.get_best_prices()[0]\
-                   .get_depart_date() == datetime.strptime('2020-04-27', "%Y-%m-%d")
+                   .depart_date == datetime.strptime('2020-04-27', "%Y-%m-%d")
 
 
 class TestGetJson(unittest.TestCase):
