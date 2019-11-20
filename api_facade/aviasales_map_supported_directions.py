@@ -30,6 +30,8 @@ class BaseSupportedDirections(object):
             self.name = self.get_name()
             self.country = self.get_country()
             self.coordinates = self.get_coordinates()
+            self.weather = self.get_weather()
+            self.weight = self.get_weight()
 
         def get_direct(self):
             return self._raw_data['direct']
@@ -46,10 +48,18 @@ class BaseSupportedDirections(object):
         def get_coordinates(self):
             return self._raw_data['coordinates']
 
+        def get_weather(self):
+            return self._raw_data['weather']
+
+        #todo: создать декоратор для преобразования типов.
+        def get_weight(self):
+            return int(self._raw_data['weight'])
+
     def __init__(self, data_supported_directions):
         self._raw_data = data_supported_directions
         self.origin = self.get_origin()
         self.directions = self.get_directions()
+
 
     def get_origin(self):
         _origin_raw_data = self._raw_data['origin']

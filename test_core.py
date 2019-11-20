@@ -34,13 +34,6 @@ _test_data_supported_directions = {
     "directions":
         [
             {
-                "direct": 'false',
-                "iata": "AAL",
-                "name": "Ольборг",
-                "country": "DK",
-                "coordinates": [9.917771, 57.028811]
-            },
-            {
             "direct": 'true',
             "iata": "AAQ",
             "name": "Анапа",
@@ -132,28 +125,36 @@ class TestBaseSupportedDirections(unittest.TestCase):
     def test_directions_direct(self):
         assert self._result \
             .get_directions()[0] \
-            .direct == 'false'
+            .direct == 'true'
 
     def test_directions_iata(self):
         assert self._result \
             .get_directions()[0] \
-            .iata == 'AAL'
+            .iata == 'AAQ'
 
     def test_directions_name(self):
         assert self._result \
             .get_directions()[0] \
-            .name == 'Ольборг'
+            .name == 'Анапа'
 
     def test_directions_country(self):
         assert self._result \
             .get_directions()[0] \
-            .country == 'DK'
+            .country == 'RU'
 
     def test_directions_coordinates(self):
         assert self._result \
             .get_directions()[0] \
-            .coordinates == [9.917771, 57.028811]
+            .coordinates == [37.316666, 44.9]
 
+    def test_directions_weight(self):
+        assert self._result \
+                   .get_directions()[0] \
+                   .weight == 0
+
+    #todo:создать отдельный класс для обертки "weather": {}
+    def test_directions_weather(self):
+        assert self._result.get_directions()[0].weather['weathertype'] == 'null'
 
 
 
