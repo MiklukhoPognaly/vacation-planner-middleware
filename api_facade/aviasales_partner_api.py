@@ -85,3 +85,12 @@ class BasePricesLatest(object):
             return False
         return True
 
+#http://api.travelpayouts.com/v1/prices/cheap?
+# origin=MOW
+# &destination=HKT
+# &depart_date=2017-11
+# &return_date=2017-12
+# &token=РазместитеЗдесьВашТокен
+
+class BasePricesCheap(object):
+    pass
