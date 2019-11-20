@@ -1,1 +1,1 @@
-from . import map_aviasales, min_prices_aviasales
+from . import aviasales_map_supported_directions, aviasales_min_prices

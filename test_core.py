@@ -3,9 +3,9 @@ import unittest
 from datetime import datetime
 import core
 import api_facade.data_cities
-import api_facade.min_prices_aviasales
+import api_facade.aviasales_min_prices
 import utils.http_requests
-from api_facade.map_aviasales import BaseSupportedDirections
+from api_facade.aviasales_map_supported_directions import BaseSupportedDirections
 import utils.http_requests
 
 def test_get_IATA_list():
@@ -31,24 +31,56 @@ _test_data_supported_directions = {
         "country": "RU",
         "coordinates": [30.315785, 59.939039]
     },
-    "directions": [{
-        "direct": 'false',
-        "iata": "AAL",
-        "name": "Ольборг",
-        "country": "DK",
-        "coordinates": [9.917771, 57.028811]
-    },
-        {
+    "directions":
+        [
+            {
+                "direct": 'false',
+                "iata": "AAL",
+                "name": "Ольборг",
+                "country": "DK",
+                "coordinates": [9.917771, 57.028811]
+            },
+            {
             "direct": 'true',
             "iata": "AAQ",
             "name": "Анапа",
             "country": "RU",
             "coordinates": [37.316666, 44.9],
-        }]
+            "weight":0,
+            "weather":
+                {
+                    "weathertype": 'null',
+                    "temp_min": 'null',
+                    "temp_max": 'null',
+                }
+            }
+        ]
 }
 
+test_best_prices_data = {
+    "errors": {},
+    "current_depart_date_prices": [],
+    "best_prices":
+        [
+            {
+                "value": '6787.0',
+                "trip_class": '0',
+                "show_to_affiliates": 'false',
+                "return_date": 'null',
+                "origin": "MOW",
+                "number_of_changes": '0',
+                "gate": "S7",
+                "found_at": "2019-11-15T01:52:26",
+                "distance": '1209',
+                "destination": "AAQ",
+                "depart_date": "2020-04-27",
+                "actual": 'true'
+            },
+        ]
+}
 
 class TestIATABaseClass(unittest.TestCase):
+
     def setUp(self):
         self._result = api_facade.data_cities.BaseCityClass(_test_data_IATA_CITIES).get_iata()[-1]
 
@@ -84,72 +116,51 @@ class TestBaseSupportedDirections(unittest.TestCase):
 
     def test_get_origin_name(self):
         assert self._result \
-                   .get_origin() \
-                   .name == "Санкт-Петербург"
+            .get_origin() \
+            .name == "Санкт-Петербург"
 
     def test_get_origin_country(self):
         assert self._result \
-                   .get_origin() \
-                   .country == "RU"
+            .get_origin() \
+            .country == "RU"
 
     def test_get_origin_coordinates(self):
         assert self._result \
-                   .get_origin() \
-                   .coordinates == [30.315785, 59.939039]
+            .get_origin() \
+            .coordinates == [30.315785, 59.939039]
 
     def test_directions_direct(self):
         assert self._result \
-                   .get_directions()[0] \
-                   .direct == 'false'
+            .get_directions()[0] \
+            .direct == 'false'
 
     def test_directions_iata(self):
         assert self._result \
-                   .get_directions()[0] \
-                   .iata == 'AAL'
+            .get_directions()[0] \
+            .iata == 'AAL'
 
     def test_directions_name(self):
         assert self._result \
-                   .get_directions()[0] \
-                   .name == 'Ольборг'
+            .get_directions()[0] \
+            .name == 'Ольборг'
 
     def test_directions_country(self):
         assert self._result \
-                   .get_directions()[0] \
-                   .country == 'DK'
+            .get_directions()[0] \
+            .country == 'DK'
 
     def test_directions_coordinates(self):
         assert self._result \
-                   .get_directions()[0] \
-                   .coordinates == [9.917771, 57.028811]
+            .get_directions()[0] \
+            .coordinates == [9.917771, 57.028811]
 
 
-test_best_prices_data = {
-    "errors": {},
-    "current_depart_date_prices": [],
-    "best_prices":
-        [
-            {
-                "value": '6787.0',
-                "trip_class": '0',
-                "show_to_affiliates": 'false',
-                "return_date": 'null',
-                "origin": "MOW",
-                "number_of_changes": '0',
-                "gate": "S7",
-                "found_at": "2019-11-15T01:52:26",
-                "distance": '1209',
-                "destination": "AAQ",
-                "depart_date": "2020-04-27",
-                "actual": 'true'
-            },
-        ]
-}
 
 
 class TestBestPrices(unittest.TestCase):
     def setUp(self):
         import datetime
-        self._result = api_facade.min_prices_aviasales.BaseCalendarPreload(test_best_prices_data)
+        self._result = api_facade.aviasales_min_prices.BaseCalendarPreload(test_best_prices_data)
 
     def test_best_prices_value(self):
         assert self._result.get_best_prices()[0].value == 6787.0
@@ -158,7 +169,7 @@ class TestBestPrices(unittest.TestCase):
         assert self._result.get_best_prices()[0].trip_class == 0
 
     def test_best_prices_return_date(self):
-        assert self._result.get_best_prices()[0].return_date is None
+        assert self._result.get_best_prices()[0].return_date == datetime.now()
 
     def test_best_prices_origin(self):
         assert self._result.get_best_prices()[0].origin == 'MOW'
@@ -175,7 +186,7 @@ class TestBestPrices(unittest.TestCase):
     def test_best_prices_distance(self):
         assert self._result.get_best_prices()[0].distance == 1209
 
-    def test_best_prices_depart_date(self):
+    def test_best_prices_depart_date_null(self):
         assert self._result.get_best_prices()[0]\
                    .depart_date == datetime.strptime('2020-04-27', "%Y-%m-%d")
 

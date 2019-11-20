@@ -3,7 +3,7 @@ import datefinder
 from api_facade.data_cities import BaseCityClass
 from utils.http_requests import get_json_raw, get_json
 import utils.http_requests
-import api_facade.min_prices_aviasales
+import api_facade.aviasales_min_prices
 
 def mapping(url, *querystring):
     _r = get_json_raw(url, *querystring)
@@ -69,7 +69,7 @@ def form_best_prices():
                 }
     )
 
-    inst = api_facade.min_prices_aviasales.BaseCalendarPreload(_raw_json)
+    inst = api_facade.aviasales_min_prices.BaseCalendarPreload(_raw_json)
 
     for best_price in inst.get_best_prices():
         print(_cities_iata_1.name,  _cities_iata_2.name,  best_price.value, best_price.return_date - best_price.depart_date)
