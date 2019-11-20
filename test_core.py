@@ -6,7 +6,7 @@ import api_facade.data_cities
 import api_facade.aviasales_min_prices
 import utils.http_requests
 from api_facade.aviasales_map_supported_directions import BaseSupportedDirections
-from api_facade.aviasales_prices_latest import BasePricesLatest
+from api_facade.aviasales_partner_api import BasePricesLatest
 import utils.http_requests
 
 def test_get_IATA_list():
@@ -40,7 +40,7 @@ _test_data_supported_directions = {
             "name": "Анапа",
             "country": "RU",
             "coordinates": [37.316666, 44.9],
-            "weight":0,
+            "weight": 0,
             "weather":
                 {
                     "weathertype": 'null',
@@ -77,7 +77,7 @@ test_data_aviasales_prices_latest = {
     "success": "true",
     "data": [
         {
-            "show_to_affiliates": "true",
+            "show_to_affiliates": True,
             "origin": "WMI",
             "destination": "WRO",
             "depart_date": "2015-12-07",
@@ -86,7 +86,7 @@ test_data_aviasales_prices_latest = {
             "value": "1183",
             "found_at": "2015-09-22T14:08:45+04:00",
             "distance": "298",
-            "actual": "true"
+            "actual": True
         }
     ]
 }

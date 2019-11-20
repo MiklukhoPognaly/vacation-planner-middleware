@@ -4,6 +4,8 @@ from api_facade.data_cities import BaseCityClass
 from utils.http_requests import get_json_raw, get_json
 import utils.http_requests
 import api_facade.aviasales_min_prices
+import api_facade.aviasales_partner_api as latest
+
 
 def mapping(url, *querystring):
     _r = get_json_raw(url, *querystring)
@@ -75,5 +77,31 @@ def form_best_prices():
         print(_cities_iata_1.name,  _cities_iata_2.name,  best_price.value, best_price.return_date - best_price.depart_date)
 
 
+#http://api.travelpayouts.com/v2/prices/latest?
+# currency=rub
+# &period_type=year
+# &page=1
+# &limit=30
+# &show_to_affiliates=true
+# &sorting=price
+# &token=РазместитеЗдесьВашТокен
+
+def get_lates_prices():
+    token = "1c3aeab21622998c22f5bdc09ef610f6"
+    _raw_json = utils.http_requests.get_json_raw('http://api.travelpayouts.com/v2/prices/latest',
+                                                 {
+                                                     'currency': 'rub',
+                                                     'period_type': "year",
+                                                     'page': '5',
+                                                     'limit': '30',
+                                                     'show_to_affiliates': 'true',
+                                                     'sorting': 'price',
+                                                     'token': token
+                                                  }
+                                                 )
+    return latest.BasePricesLatest(_raw_json)
+
+
 if __name__ == "__main__":
-    form_best_prices()
+    for i in get_lates_prices().get_data():
+        print(i.origin, i.depart_date, i.return_date, i.value, i.distance)

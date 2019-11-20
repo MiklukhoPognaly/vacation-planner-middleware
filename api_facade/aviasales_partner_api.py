@@ -46,9 +46,7 @@ class BasePricesLatest(object):
             self.actual = self.get_actual()
 
         def get_show_to_affiliates(self):
-            if not self.data['show_to_affiliates'].lower() == "true":
-                return False
-            return True
+            return self.data['show_to_affiliates']
 
         def get_origin(self):
             return self.data['origin']
@@ -74,9 +72,7 @@ class BasePricesLatest(object):
             return int(self.data['distance'])
 
         def get_actual(self):
-            if not self.data['actual'].lower() == 'true':
-                return False
-            return True
+           return self.data['actual']
 
     def get_data(self):
         chunk = []

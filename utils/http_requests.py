@@ -24,7 +24,8 @@ def date_formatter_api_json_error_decorator(function):
     return internal_function
 
 
-@aviasales_api_json_error_decorator
+#@aviasales_api_json_error_decorator
+
 def get_json_raw(url, *querystring):
     _r = requests.get(url, *querystring)
     return _r.json()
