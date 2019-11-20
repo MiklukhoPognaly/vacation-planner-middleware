@@ -6,6 +6,7 @@ import api_facade.data_cities
 import api_facade.aviasales_min_prices
 import utils.http_requests
 from api_facade.aviasales_map_supported_directions import BaseSupportedDirections
+from api_facade.aviasales_prices_latest import BasePricesLatest
 import utils.http_requests
 
 def test_get_IATA_list():
@@ -72,11 +73,63 @@ test_best_prices_data = {
         ]
 }
 
+test_data_aviasales_prices_latest = {
+    "success": "true",
+    "data": [
+        {
+            "show_to_affiliates": "true",
+            "origin": "WMI",
+            "destination": "WRO",
+            "depart_date": "2015-12-07",
+            "return_date": "2015-12-13",
+            "number_of_changes": "0",
+            "value": "1183",
+            "found_at": "2015-09-22T14:08:45+04:00",
+            "distance": "298",
+            "actual": "true"
+        }
+    ]
+}
+
+class TestBaseAviasalesPricesLatest(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def test_success(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).success == True
+
+    def test_data_show_to_affiliates(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).get_data()[0].show_to_affiliates == True
+
+    def test_data_origin(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).get_data()[0].origin == "WMI"
+
+    def test_data_destination(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).get_data()[0].destination == "WRO"
+    
+    def test_data_depart_date(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).get_data()[0].depart_date == datetime.strptime('2015-12-07', "%Y-%m-%d")
+    
+    def test_data_return_date(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).get_data()[0].return_date == datetime.strptime('2015-12-13', "%Y-%m-%d")
+        
+    def test_data_number_of_changes(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).get_data()[0].number_of_changes == 0
+
+    def test_data_value(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).get_data()[0].value == 1183
+
+    def test_data_found_at(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).get_data()[0].distance == 298
+
+    def test_data_actual(self):
+        assert BasePricesLatest(test_data_aviasales_prices_latest).get_data()[0].actual == True
+
+
 class TestIATABaseClass(unittest.TestCase):
 
     def setUp(self):
         self._result = api_facade.data_cities.BaseCityClass(_test_data_IATA_CITIES).get_iata()[-1]
-
 
     def test_name(self):
         assert self._result.name == 'Тест'
