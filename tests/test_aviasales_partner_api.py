@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime
-from api_facade.aviasales_partner_api import BasePricesLatest, BasePricesCheap
+from api_facade.aviasales_partner_api import BasePricesLatest, BasePricesCheap, BasePricesMonthMatrix
 
 
 class TestBaseAviasalesPricesLatest(unittest.TestCase):
@@ -126,3 +126,56 @@ class TestBasePricesCheap(unittest.TestCase):
 
     def test_data_HKT_second_expires_at(self):
         assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].expires_at == "2015-01-08T18:38:45Z"
+
+
+class TestBasePricesMonthMatrix(unittest.TestCase):
+    def setUp(self):
+        self.test_data = {
+                           "success": True,
+                           "data": [
+                               {
+                                  "show_to_affiliates": True,
+                                  "trip_class": 0,
+                                  "origin": "LED",
+                                  "destination": "HKT",
+                                  "depart_date": "2015-10-01",
+                                  "return_date": "",
+                                  "number_of_changes": 1,
+                                  "value": 29127,
+                                  "found_at": "2015-09-24T00:06:12+04:00",
+                                  "distance": 8015,
+                                  "actual": True
+                               }
+                           ]
+        }
+        self.test_object = BasePricesMonthMatrix(self.test_data)
+
+    def test_success(self):
+        self.assertTrue(self.test_object.success)
+
+    def test_data_show_to_affiliates(self):
+        self.assertTrue(self.test_object.data_list[0].show_to_affiliates)
+
+    def test_data_trip_class(self):
+        self.assertEqual(self.test_object.data_list[0].trip_class, 0)
+
+    def test_data_origin(self):
+        self.assertEqual(self.test_object.data_list[0].origin, "LED")
+
+    def test_data_destination(self):
+        self.assertEqual(self.test_object.data_list[0].destination, "HKT")
+
+    def test_data_depart_date(self):
+        self.assertEqual(self.test_object.data_list[0].depart_date, datetime.strptime('2015-10-01', "%Y-%m-%d"))
+
+    def test_data_return_date(self):
+        self.assertEqual(self.test_object.data_list[0].return_date, datetime.now())
+
+    def test_data_number_of_changes(self):
+        self.assertEqual(self.test_object.data_list[0].number_of_changes, 1)
+
+    def test_data_value(self):
+        self.assertEqual(self.test_object.data_list[0].value, 29127)
+
+    def test_data_distance(self):
+        self.assertEqual(self.test_object.data_list[0].distance, 8015)
