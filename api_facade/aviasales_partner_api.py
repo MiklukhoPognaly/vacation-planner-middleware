@@ -92,5 +92,79 @@ class BasePricesLatest(object):
 # &return_date=2017-12
 # &token=РазместитеЗдесьВашТокен
 
+
+data = {
+                                   "success": True,
+                                   "data": {
+                                      "HKT": {
+                                         "0": {
+                                            "price": 35443,
+                                            "airline": "UN",
+                                            "flight_number": 571,
+                                            "departure_at": "2015-06-09T21:20:00Z",
+                                            "return_at": "2015-07-15T12:40:00Z",
+                                            "expires_at": "2015-01-08T18:30:40Z"
+                                         },
+                                         "1": {
+                                            "price": 27506,
+                                            "airline": "CX",
+                                            "flight_number": 204,
+                                            "departure_at": "2015-06-05T16:40:00Z",
+                                            "return_at": "2015-06-22T12:00:00Z",
+                                            "expires_at": "2015-01-08T18:38:45Z"
+                                         },
+                                         "2": {
+                                            "price": 31914,
+                                            "airline": "AB",
+                                            "flight_number": 8113,
+                                            "departure_at": "2015-06-12T13:45:00Z",
+                                            "return_at": "2015-06-24T20:30:00Z",
+                                            "expires_at": "2015-01-08T15:17:42Z"
+                                         }
+                                      }
+                                   }
+        }
+
+
 class BasePricesCheap(object):
-    pass
+    def __init__(self, raw_data, city_iata):
+        self.data = raw_data
+        self.city_iata = city_iata
+        self.success = self.get_success()
+
+    class InternalClassObject(object):
+        def __init__(self, data):
+            self.data = data
+            self.price = self.get_price()
+            self.airline = self.get_airline()
+            self.flight_number = self.get_flight_number()
+            self.departure_at = self.get_departure_at()
+            self.return_at = self.get_return_at()
+            self.expires_at = self.get_expires_at()
+
+        def get_price(self):
+            return self.data['price']
+
+        def get_airline(self):
+            return self.data['airline']
+
+        def get_flight_number(self):
+            return self.data['flight_number']
+
+        def get_departure_at(self):
+            return self.data['departure_at']
+
+        def get_return_at(self):
+            return self.data['return_at']
+
+        def get_expires_at(self):
+            return self.data['expires_at']
+
+    def get_data(self):
+        chunk = []
+        for _, raw_data in self.data['data'][self.city_iata].items():
+            chunk.append(BasePricesCheap.InternalClassObject(raw_data))
+        return chunk
+
+    def get_success(self):
+        return self.data['success']

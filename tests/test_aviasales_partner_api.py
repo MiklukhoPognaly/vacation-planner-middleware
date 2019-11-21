@@ -89,31 +89,40 @@ class TestBasePricesCheap(unittest.TestCase):
         }
 
     def test_success(self):
-        self.assertTrue(BasePricesCheap(self.test_data_aviasales_prices_cheap).success)
+        self.assertTrue(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').success)
 
-    def test_data_HKT_first(self):
-        assert BasePricesCheap(self.test_data_aviasales_prices_cheap).get_data()[0].show_to_affiliates == True
+    def test_data_HKT_first_price(self):
+        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[0].price == 35443
 
-    def test_data_origin(self):
-        assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].origin == "WMI"
+    def test_data_HKT_second_price(self):
+        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].price == 27506
 
-    def test_data_destination(self):
-        assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].destination == "WRO"
+    def test_data_HKT_first_airline(self):
+        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[0].airline == "UN"
 
-    def test_data_depart_date(self):
-        assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].depart_date == datetime.strptime('2015-12-07', "%Y-%m-%d")
+    def test_data_HKT_second_airline(self):
+        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].airline == "CX"
 
-    def test_data_return_date(self):
-        assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].return_date == datetime.strptime('2015-12-13', "%Y-%m-%d")
+    def test_data_HKT_first_flight_number(self):
+        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[0].flight_number, 571)
 
-    def test_data_number_of_changes(self):
-        assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].number_of_changes == 0
+    def test_data_HKT_second_flight_number(self):
+        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].flight_number == 204
 
-    def test_data_value(self):
-        assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].value == 1183
+    def test_data_HKT_first_departure_at(self):
+        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[0].departure_at, "2015-06-09T21:20:00Z")
 
-    def test_data_found_at(self):
-        assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].distance == 298
+    def test_data_HKT_second_departure_at(self):
+        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].departure_at == "2015-06-05T16:40:00Z"
 
-    def test_data_actual(self):
-        self.assertTrue(BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].actual)
+    def test_data_HKT_first_return_at(self):
+        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[0].return_at, "2015-07-15T12:40:00Z")
+
+    def test_data_HKT_second_return_at(self):
+       self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].return_at, "2015-06-22T12:00:00Z")
+
+    def test_data_HKT_first_expires_at(self):
+        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[0].expires_at == "2015-01-08T18:30:40Z"
+
+    def test_data_HKT_second_expires_at(self):
+        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].expires_at == "2015-01-08T18:38:45Z"
