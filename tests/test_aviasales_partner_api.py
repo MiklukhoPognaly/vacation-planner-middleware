@@ -110,22 +110,34 @@ class TestBasePricesCheap(unittest.TestCase):
         assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].flight_number == 204
 
     def test_data_HKT_first_departure_at(self):
-        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[0].departure_at, "2015-06-09T21:20:00Z")
+        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
+                         .get_data()[0].departure_at,
+                         datetime.strptime("2015-06-09T21:20:00Z", "%Y-%m-%dT%H:%M:%SZ"))
 
     def test_data_HKT_second_departure_at(self):
-        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].departure_at == "2015-06-05T16:40:00Z"
+        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
+                         .get_data()[1].departure_at,
+                         datetime.strptime("2015-06-05T16:40:00Z", "%Y-%m-%dT%H:%M:%SZ"))
 
     def test_data_HKT_first_return_at(self):
-        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[0].return_at, "2015-07-15T12:40:00Z")
+        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
+                         .get_data()[0].return_at,
+                         datetime.strptime("2015-07-15T12:40:00Z", "%Y-%m-%dT%H:%M:%SZ"))
 
     def test_data_HKT_second_return_at(self):
-       self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].return_at, "2015-06-22T12:00:00Z")
+        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
+                         .get_data()[1].return_at,
+                         datetime.strptime("2015-06-22T12:00:00Z", '%Y-%m-%dT%H:%M:%SZ'))
 
     def test_data_HKT_first_expires_at(self):
-        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[0].expires_at == "2015-01-08T18:30:40Z"
+        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
+                         .get_data()[0].expires_at,
+                         datetime.strptime("2015-01-08T18:30:40Z", '%Y-%m-%dT%H:%M:%SZ'))
 
     def test_data_HKT_second_expires_at(self):
-        assert BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT').get_data()[1].expires_at == "2015-01-08T18:38:45Z"
+        self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
+                         .get_data()[1].expires_at,
+                         datetime.strptime("2015-01-08T18:38:45Z", '%Y-%m-%dT%H:%M:%SZ'))
 
 
 class TestBasePricesMonthMatrix(unittest.TestCase):
@@ -228,11 +240,17 @@ class TestBasePricesDirect(unittest.TestCase):
     def test_get_data_flight_number(self):
         self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].flight_number, 8113)
 
-    def test_get_data_departure_at(self):
-        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].departure_at, "2015-06-12T13:45:00Z")
+    def htest_get_data_departure_at(self):
+        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT')
+                         .data_list[-1].departure_at,
+                         datetime.strptime("2015-06-12T13:45:00Z", "%Y-%m-%dT%H:%M:%SZ"))
 
     def test_get_data_return_at(self):
-        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].return_at, "2015-06-24T20:30:00Z")
+        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT')
+                         .data_list[-1].return_at,
+                         datetime.strptime("2015-06-24T20:30:00Z", "%Y-%m-%dT%H:%M:%SZ"))
 
     def test_get_data_expires_at(self):
-        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].expires_at, "2015-01-08T15:17:42Z")
+        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT')
+                         .data_list[-1].expires_at,
+                         datetime.strptime("2015-01-08T15:17:42Z", "%Y-%m-%dT%H:%M:%SZ"))

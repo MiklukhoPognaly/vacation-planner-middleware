@@ -1,5 +1,5 @@
 from datetime import datetime
-from utils.http_requests import aviasales_api_json_error_decorator, date_formatter_api_json_error_decorator
+from utils.decorators import datetime_formatter_method_decorator, aviasales_api_json_error_decorator
 
 
 class BaseCalendarPreload(object):
@@ -44,11 +44,11 @@ class BaseCalendarPreload(object):
         def get_origin(self):
             return self._raw_data['origin']
 
-        @date_formatter_api_json_error_decorator
+        @datetime_formatter_method_decorator()
         def get_return_date(self):
             return self._raw_data['return_date']
 
-        @date_formatter_api_json_error_decorator
+        @datetime_formatter_method_decorator()
         def get_depart_date(self):
             return self._raw_data['depart_date']
 
@@ -64,7 +64,7 @@ class BaseCalendarPreload(object):
         def get_destination(self):
             return self._raw_data['destination']
 
-    @aviasales_api_json_error_decorator
+
     def get_best_prices(self):
         chunk = []
         for item in self._raw_data['best_prices']:

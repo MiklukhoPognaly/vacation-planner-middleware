@@ -1,3 +1,4 @@
+import utils.decorators
 import utils.http_requests
 
 
@@ -29,11 +30,11 @@ class BasePricesLatest(object):
         def get_destination(self):
             return self.data['destination']
 
-        @utils.http_requests.date_formatter_api_json_error_decorator
+        @utils.decorators.datetime_formatter_method_decorator()
         def get_depart_date(self):
             return self.data['depart_date']
 
-        @utils.http_requests.date_formatter_api_json_error_decorator
+        @utils.decorators.datetime_formatter_method_decorator()
         def get_return_date(self):
             return self.data['return_date']
 
@@ -86,12 +87,15 @@ class BasePricesCheap(object):
         def get_flight_number(self):
             return self.data['flight_number']
 
+        @utils.decorators.datetime_formatter_api_json_error_decorator
         def get_departure_at(self):
             return self.data['departure_at']
 
+        @utils.decorators.datetime_formatter_api_json_error_decorator
         def get_return_at(self):
             return self.data['return_at']
 
+        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%dT%H:%M:%SZ')
         def get_expires_at(self):
             return self.data['expires_at']
 
@@ -121,43 +125,43 @@ class BasePricesMonthMatrix(object):
     class InternalClassObject(object):
         def __init__(self, data):
             self.data = data
-            self.show_to_affiliates = self.get_show_to_affiliates()
-            self.trip_class = self.get_trip_class()
-            self.origin = self.get_origin()
-            self.destination = self.get_destination()
-            self.depart_date = self.get_depart_date()
-            self.return_date = self.get_return_date()
-            self.number_of_changes = self.get_number_of_changes()
-            self.value = self.get_value()
-            self.distance = self.get_distance()
+            self.show_to_affiliates = self.__get_show_to_affiliates()
+            self.trip_class = self.__get_trip_class()
+            self.origin = self.__get_origin()
+            self.destination = self.__get_destination()
+            self.depart_date = self.__get_depart_date()
+            self.return_date = self.__get_return_date()
+            self.number_of_changes = self.__get_number_of_changes()
+            self.value = self.__get_value()
+            self.distance = self.__get_distance()
 
-        def get_show_to_affiliates(self):
+        def __get_show_to_affiliates(self):
             return self.data['show_to_affiliates']
 
-        def get_trip_class(self):
+        def __get_trip_class(self):
             return self.data['trip_class']
 
-        def get_origin(self):
+        def __get_origin(self):
             return self.data['origin']
 
-        def get_destination(self):
+        def __get_destination(self):
             return self.data['destination']
 
-        @utils.http_requests.date_formatter_api_json_error_decorator
-        def get_depart_date(self):
+        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%d')
+        def __get_depart_date(self):
             return self.data['depart_date']
 
-        @utils.http_requests.date_formatter_api_json_error_decorator
-        def get_return_date(self):
+        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%d')
+        def __get_return_date(self):
             return self.data['return_date']
 
-        def get_number_of_changes(self):
+        def __get_number_of_changes(self):
             return self.data['number_of_changes']
 
-        def get_value(self):
+        def __get_value(self):
             return self.data['value']
 
-        def get_distance(self):
+        def __get_distance(self):
             return self.data['distance']
 
 
@@ -174,13 +178,13 @@ class BasePricesDirect(object):
     def __init__(self, data, destination):
         self.destination = destination
         self.__raw_data = data
-        self.success = self.get_success()
-        self.data_list = self.get_data()
+        self.success = self.__get_success()
+        self.data_list = self.__get_data()
 
-    def get_success(self):
+    def __get_success(self):
         return self.__raw_data['success']
 
-    def get_data(self):
+    def __get_data(self):
         chunk = []
         for _, object in self.__raw_data['data'][self.destination].items():
             chunk.append(BasePricesDirect.InternalObject(object))
@@ -189,27 +193,30 @@ class BasePricesDirect(object):
     class InternalObject(object):
         def __init__(self, data):
             self.__raw_data = data
-            self.price = self.get_price()
-            self.airline  = self.get_airline()
-            self.flight_number = self.get_flight_number()
-            self.departure_at = self.get_departure_at()
-            self.return_at = self.get_return_at()
-            self.expires_at = self.get_expires_at()
+            self.price = self.__get_price()
+            self.airline  = self.__get_airline()
+            self.flight_number = self.__get_flight_number()
+            self.departure_at = self.__get_departure_at()
+            self.return_at = self.__get_return_at()
+            self.expires_at = self.__get_expires_at()
 
-        def get_price(self):
+        def __get_price(self):
             return self.__raw_data['price']
 
-        def get_airline(self):
+        def __get_airline(self):
             return self.__raw_data['airline']
 
-        def get_flight_number(self):
+        def __get_flight_number(self):
             return self.__raw_data['flight_number']
 
-        def get_departure_at(self):
+        @utils.decorators.datetime_formatter_api_json_error_decorator
+        def __get_departure_at(self):
             return self.__raw_data['departure_at']
 
-        def get_return_at(self):
+        @utils.decorators.datetime_formatter_api_json_error_decorator
+        def __get_return_at(self):
             return self.__raw_data['return_at']
 
-        def get_expires_at(self):
+        @utils.decorators.datetime_formatter_api_json_error_decorator
+        def __get_expires_at(self):
             return self.__raw_data['expires_at']

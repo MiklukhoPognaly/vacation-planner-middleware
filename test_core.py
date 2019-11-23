@@ -190,16 +190,16 @@ class TestBestPrices(unittest.TestCase):
                    .depart_date == datetime.strptime('2020-04-27', "%Y-%m-%d")
 
 
-class TestGetJson(unittest.TestCase):
-    def setUp(self):
-        self._url = "http://min-prices.aviasales.ru/calendar_preload"
-
-    def test_get_json(self):
-        #origin=MOW&destination=AAQ&depart_date=2019-12-01&one_way=true
-        assert 'best_prices' in utils.http_requests.get_json_raw(self._url, {"origin": "MOW",
-                                                     "destination": "AAQ",
-                                                     "depart_date": "2019-12-01",
-                                                     "one_way": "true"}).keys()
+# class TestGetJson(unittest.TestCase):
+#     def setUp(self):
+#         self._url = "http://min-prices.aviasales.ru/calendar_preload"
+#
+#     def test_get_json(self):
+#         #origin=MOW&destination=AAQ&depart_date=2019-12-01&one_way=true
+#         assert 'best_prices' in utils.http_requests.get_json_raw(self._url, {"origin": "MOW",
+#                                                      "destination": "MOW",
+#                                                      "depart_date": "2020-12-01",
+#                                                      "one_way": "true"}).keys()
 
 
 class TestErrorDecorator(unittest.TestCase):
