@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime
-from api_facade.aviasales_partner_api import BasePricesLatest, BasePricesCheap, BasePricesMonthMatrix
+from api_facade.aviasales_partner_api import BasePricesLatest, BasePricesCheap, BasePricesMonthMatrix, BasePricesDirect
 
 
 class TestBaseAviasalesPricesLatest(unittest.TestCase):
@@ -179,3 +179,60 @@ class TestBasePricesMonthMatrix(unittest.TestCase):
 
     def test_data_distance(self):
         self.assertEqual(self.test_object.data_list[0].distance, 8015)
+
+
+class TestBasePricesDirect(unittest.TestCase):
+    def setUp(self):
+
+        self._raw_data = {
+       "success":True,
+       "data": {
+          "HKT": {
+             "0": {
+                "price": 35443,
+                "airline": "UN",
+                "flight_number": 571,
+                "departure_at": "2015-06-09T21:20:00Z",
+                "return_at": "2015-07-15T12:40:00Z",
+                "expires_at": "2015-01-08T18:30:40Z"
+             },
+             "1": {
+                "price": 27506,
+                "airline": "CX",
+                "flight_number": 204,
+                "departure_at": "2015-06-05T16:40:00Z",
+                "return_at": "2015-06-22T12:00:00Z",
+                "expires_at": "2015-01-08T18:38:45Z"
+             },
+             "2": {
+                "price": 31914,
+                "airline": "AB",
+                "flight_number": 8113,
+                "departure_at": "2015-06-12T13:45:00Z",
+                "return_at": "2015-06-24T20:30:00Z",
+                "expires_at": "2015-01-08T15:17:42Z"
+             }
+          }
+       }}
+
+
+    def test_get_success(self):
+        self.assertTrue(BasePricesDirect(self._raw_data, 'HKT').success)
+
+    def test_get_data_price(self):
+            self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].price, 31914)
+
+    def test_get_data_airline(self):
+        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].airline, "AB")
+
+    def test_get_data_flight_number(self):
+        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].flight_number, 8113)
+
+    def test_get_data_departure_at(self):
+        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].departure_at, "2015-06-12T13:45:00Z")
+
+    def test_get_data_return_at(self):
+        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].return_at, "2015-06-24T20:30:00Z")
+
+    def test_get_data_expires_at(self):
+        self.assertEqual(BasePricesDirect(self._raw_data, 'HKT').data_list[-1].expires_at, "2015-01-08T15:17:42Z")

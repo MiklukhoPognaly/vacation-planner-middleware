@@ -112,27 +112,6 @@ class BasePricesCheap(object):
 # &show_to_affiliates=true
 # &token=РазместитеЗдесьВашТокен
 
-
-
-data = {
-   "success": True,
-   "data": [
-       {
-          "show_to_affiliates": True,
-          "trip_class": 0,
-          "origin": "LED",
-          "destination": "HKT",
-          "depart_date": "2015-10-01",
-          "return_date": "",
-          "number_of_changes": 1,
-          "value": 29127,
-          "found_at": "2015-09-24T00:06:12+04:00",
-          "distance": 8015,
-          "actual": True
-       }
-   ]
-}
-
 class BasePricesMonthMatrix(object):
     def __init__(self, raw_data):
         self.__raw_data = raw_data
@@ -190,3 +169,47 @@ class BasePricesMonthMatrix(object):
 
     def __get_success(self):
         return self.__raw_data['success']
+
+class BasePricesDirect(object):
+    def __init__(self, data, destination):
+        self.destination = destination
+        self.__raw_data = data
+        self.success = self.get_success()
+        self.data_list = self.get_data()
+
+    def get_success(self):
+        return self.__raw_data['success']
+
+    def get_data(self):
+        chunk = []
+        for _, object in self.__raw_data['data'][self.destination].items():
+            chunk.append(BasePricesDirect.InternalObject(object))
+        return chunk
+
+    class InternalObject(object):
+        def __init__(self, data):
+            self.__raw_data = data
+            self.price = self.get_price()
+            self.airline  = self.get_airline()
+            self.flight_number = self.get_flight_number()
+            self.departure_at = self.get_departure_at()
+            self.return_at = self.get_return_at()
+            self.expires_at = self.get_expires_at()
+
+        def get_price(self):
+            return self.__raw_data['price']
+
+        def get_airline(self):
+            return self.__raw_data['airline']
+
+        def get_flight_number(self):
+            return self.__raw_data['flight_number']
+
+        def get_departure_at(self):
+            return self.__raw_data['departure_at']
+
+        def get_return_at(self):
+            return self.__raw_data['return_at']
+
+        def get_expires_at(self):
+            return self.__raw_data['expires_at']
