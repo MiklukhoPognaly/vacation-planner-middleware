@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 from api_facade.aviasales_partner_api import BasePricesLatest, BasePricesCheap\
-    , BasePricesMonthMatrix, BasePricesDirect, BasePricesCalendar
+    , BasePricesMonthMatrix, BasePricesDirect, BasePricesCalendar, BasePricesNearestPlacesMatrix
 
 
 class TestBaseAviasalesPricesLatest(unittest.TestCase):
@@ -333,3 +333,77 @@ class TestBasePricesCalendar(unittest.TestCase):
 
     def test_data_flight_number(self):
         self.assertEqual(self.result.data_list[-1].flight_number, 578)
+
+
+class TestBasePricesNearestPlacesMatrix(unittest.TestCase):
+    def setUp(self) -> None:
+        self.data = {
+            "prices": [
+                {
+                    "value": 26000,
+                    "trip_class": 0,
+                    "show_to_affiliates": True,
+                    "return_date": "2018-09-18",
+                    "origin": "BAX",
+                    "number_of_changes": 0,
+                    "gate": "AMADEUS",
+                    "found_at": "2018-07-28T04:57:47Z",
+                    "duration": "null",
+                    "distance": 3643,
+                    "destination": "SIP",
+                    "depart_date": "2018-09-09",
+                    "actual": True
+                }
+            ],
+            "origins": [
+                "BAX"
+            ],
+            "errors": {
+                "amadeus": {}
+            },
+            "destinations": [
+                "SIP"
+            ]
+        }
+        self.result = BasePricesNearestPlacesMatrix(self.data)
+
+    def test_prices_value(self):
+        self.assertEqual(self.result.prices_list[0].value, 26000)
+
+    def test_prices_trip_class(self):
+        self.assertEqual(self.result.prices_list[0].trip_class, 0)
+
+    def test_prices_show_to_affiliates(self):
+        self.assertTrue(self.result.prices_list[0].show_to_affiliates)
+
+    def test_prices_return_date(self):
+        self.assertEqual(self.result.prices_list[0].return_date, datetime.strptime('2018-09-18', '%Y-%m-%d'))
+
+    def test_prices_origin(self):
+        self.assertEqual(self.result.prices_list[0].origin, 'BAX')
+
+    def test_prices_number_of_changes(self):
+        self.assertEqual(self.result.prices_list[0].number_of_changes, 0)
+
+    def test_prices_gate(self):
+        self.assertEqual(self.result.prices_list[0].gate, 'AMADEUS')
+
+    def test_prices_found_at(self):
+        self.assertEqual(self.result.prices_list[0].found_at,
+                         datetime.strptime('2018-07-28T04:57:47Z', '%Y-%m-%dT%H:%M:%SZ'))
+
+    def test_prices_duration(self):
+        self.assertEqual(self.result.prices_list[0].duration, 'null')
+
+    def test_prices_distance(self):
+        self.assertEqual(self.result.prices_list[0].distance, 3643)
+
+    def test_prices_destination(self):
+        self.assertEqual(self.result.prices_list[0].destination, 'SIP')
+
+    def test_prices_depart_date(self):
+        self.assertEqual(self.result.prices_list[0].depart_date,
+                         datetime.strptime('2018-09-09', '%Y-%m-%d'))
+
+    def test_prices_actual(self):
+        self.assertTrue(self.result.prices_list[0].actual)
