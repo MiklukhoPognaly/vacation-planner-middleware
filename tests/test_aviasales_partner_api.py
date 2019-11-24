@@ -1,6 +1,7 @@
 import unittest
 from datetime import datetime
-from api_facade.aviasales_partner_api import BasePricesLatest, BasePricesCheap, BasePricesMonthMatrix, BasePricesDirect
+from api_facade.aviasales_partner_api import BasePricesLatest, BasePricesCheap\
+    , BasePricesMonthMatrix, BasePricesDirect, BasePricesCalendar
 
 
 class TestBaseAviasalesPricesLatest(unittest.TestCase):
@@ -254,3 +255,81 @@ class TestBasePricesDirect(unittest.TestCase):
         self.assertEqual(BasePricesDirect(self._raw_data, 'HKT')
                          .data_list[-1].expires_at,
                          datetime.strptime("2015-01-08T15:17:42Z", "%Y-%m-%dT%H:%M:%SZ"))
+
+
+class TestBasePricesCalendar(unittest.TestCase):
+    def setUp(self) -> None:
+        self.data = {
+           "success": True,
+           "data": {
+              "2015-06-01": {
+                 "origin": "MOW",
+                 "destination": "BCN",
+                 "price": 12449,
+                 "transfers": 1,
+                 "airline": "PS",
+                 "flight_number": 576,
+                 "departure_at": "2015-06-01T06:35:00Z",
+                 "return_at": "2015-07-01T13:30:00Z",
+                 "expires_at": "2015-01-07T12:34:14Z"
+              },
+              "2015-06-02": {
+                 "origin": "MOW",
+                 "destination": "BCN",
+                 "price": 13025,
+                 "transfers": 1,
+                 "airline": "PS",
+                 "flight_number": 578,
+                 "departure_at": "2015-06-02T17:00:00Z",
+                 "return_at": "2015-06-11T13:30:00Z",
+                 "expires_at": "2015-01-06T17:15:47Z"
+              },
+
+              "2015-06-30": {
+                 "origin": "MOW",
+                 "destination": "BCN",
+                 "price": 13025,
+                 "transfers": 1,
+                 "airline": "PS",
+                 "flight_number": 578,
+                 "departure_at": "2015-06-30T17:00:00Z",
+                 "return_at": "2015-07-23T13:30:00Z",
+                 "expires_at": "2015-01-07T20:15:34Z"
+              }
+           }
+        }
+
+        self.result = BasePricesCalendar(self.data)
+
+    def test_success(self):
+        self.assertTrue(self.result.success)
+
+    def test_data_origin(self):
+        self.assertEqual(self.result.data_list[-1].origin, 'MOW')
+
+    def test_data_destination(self):
+        self.assertEqual(self.result.data_list[-1].destination, 'BCN')
+
+    def test_data_price(self):
+        self.assertEqual(self.result.data_list[-1].price, 13025)
+
+    def test_data_transfers(self):
+        self.assertEqual(self.result.data_list[-1].transfers, 1)
+
+    def test_data_airline(self):
+        self.assertEqual(self.result.data_list[-1].airline, "PS")
+
+    def test_data_departure_date(self):
+        self.assertEqual(self.result.data_list[-1].departure_at,
+                         datetime.strptime("2015-06-30T17:00:00Z", '%Y-%m-%dT%H:%M:%SZ'))
+
+    def test_data_return_at(self):
+        self.assertEqual(self.result.data_list[-1].return_at,
+                         datetime.strptime("2015-07-23T13:30:00Z", '%Y-%m-%dT%H:%M:%SZ'))
+
+    def test_data_expires_at(self):
+        self.assertEqual(self.result.data_list[-1].expires_at,
+                         datetime.strptime("2015-01-07T20:15:34Z", '%Y-%m-%dT%H:%M:%SZ'))
+
+    def test_data_flight_number(self):
+        self.assertEqual(self.result.data_list[-1].flight_number, 578)
