@@ -1,4 +1,11 @@
-class BaseCityClass(object):
+from requests import get
+
+def request_cities_iata_list(url='http://api.travelpayouts.com/data/ru/cities.json'):
+    return get(url).json()
+
+
+
+class BaseCitiesClass(object):
 
     def __init__(self, city_IATA_dict):
         self._city_IATA_dict = city_IATA_dict
@@ -6,7 +13,7 @@ class BaseCityClass(object):
     def get_iata(self):
         chunk = []
         for item in self._city_IATA_dict:
-            chunk.append(BaseCityClass.InternalIata(item))
+            chunk.append(BaseCitiesClass.InternalIata(item))
         return chunk
 
     class InternalIata(object):
@@ -40,3 +47,7 @@ class BaseCityClass(object):
 
         def __get_country_code(self):
             return self._city_IATA_dict['country_code']
+
+if __name__ == '__main__':
+    response_json = request_cities_iata_list()
+    print(BaseCitiesClass(response_json).get_iata()[-1].name)
