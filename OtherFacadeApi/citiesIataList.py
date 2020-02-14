@@ -1,4 +1,7 @@
 from requests import get
+import unittest
+from Helpers import httpHelpers
+
 
 def request_cities_iata_list(url='http://api.travelpayouts.com/data/ru/cities.json'):
     return get(url).json()
@@ -7,8 +10,12 @@ def request_cities_iata_list(url='http://api.travelpayouts.com/data/ru/cities.js
 
 class BaseCitiesClass(object):
 
-    def __init__(self, city_IATA_dict):
-        self._city_IATA_dict = city_IATA_dict
+    def __init__(self, url="http://api.travelpayouts.com/data/ru/cities.json"):
+        self.__request_cities_list(url)
+        self.towns = self.get_iata()
+
+    def __request_cities_list(self, url):
+        self._city_IATA_dict = httpHelpers.getJsonData(url)
 
     def get_iata(self):
         chunk = []
@@ -54,6 +61,11 @@ class BaseCitiesClass(object):
                 'iata': self.iata,
                 'coordinates': self.coordinates,
             }
+
+class TestBaseCitiesClass(unittest.TestCase):
+    def test_BaseClass(self):
+        result = BaseCitiesClass({"sdf":"sdf"})
+        self.assertEqual(result.towns, "")
 
 
 if __name__ == '__main__':

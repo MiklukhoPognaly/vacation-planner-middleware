@@ -1,5 +1,20 @@
 import utils.decorators
 import utils.http_requests
+import requests
+
+def get_cheap_prices(iata_town_origin, iata_town_destination):
+
+
+    response = requests.get("http://api.travelpayouts.com/v1/prices/cheap?origin={}&destination={}&token=1c3aeab21622998c22f5bdc09ef610f6".format(iata_town_origin, iata_town_destination)).json()
+    try:
+
+        prices_object = BasePricesCheap(response, iata_town_destination)
+    except KeyError:
+        print(u'Нет данных для данного маршрута')
+    else:
+        return prices_object.prices[-1]
+
+
 
 
 class BasePricesLatest(object):
@@ -67,6 +82,7 @@ class BasePricesCheap(object):
         self.data = raw_data
         self.city_iata = city_iata
         self.success = self.get_success()
+        self.prices = self.get_data()
 
     class InternalClassObject(object):
         def __init__(self, data):
@@ -101,6 +117,8 @@ class BasePricesCheap(object):
 
     def get_data(self):
         chunk = []
+        if self.data['data'] is None:
+            raise KeyError
         for _, raw_data in self.data['data'][self.city_iata].items():
             chunk.append(BasePricesCheap.InternalClassObject(raw_data))
         return chunk
@@ -350,3 +368,7 @@ class BasePricesNearestPlacesMatrix(object):
 
         def __get_actual(self):
             return self.data['actual']
+
+
+if __name__ == "__main__":
+    print(get_cheap_prices('YBI'))

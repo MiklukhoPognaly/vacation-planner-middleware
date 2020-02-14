@@ -1,10 +1,9 @@
 # coding=utf-8
 import unittest
 from datetime import datetime
-import api_facade.data_cities
-import api_facade.aviasales_min_prices
+
 import utils.http_requests
-from api_facade.aviasales_map_supported_directions import BaseSupportedDirections
+from AviasalesFacadeApi.aviasales_map_supported_directions import BaseSupportedDirections
 import utils.http_requests
 
 def test_get_IATA_list():

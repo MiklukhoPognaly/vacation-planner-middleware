@@ -1,6 +1,6 @@
 import unittest2 as unittest
 from datetime import datetime
-from api_facade.aviasales_partner_api import BasePricesLatest, BasePricesCheap\
+from AviasalesFacadeApi.aviasales_partner_api import BasePricesLatest, BasePricesCheap\
     , BasePricesMonthMatrix, BasePricesDirect, BasePricesCalendar, BasePricesNearestPlacesMatrix
 
 

@@ -70,3 +70,7 @@ class BaseCalendarPreload(object):
         for item in self._raw_data['best_prices']:
             chunk.append(BaseCalendarPreload.InternalBestPrices(item))
         return chunk
+
+
+
+
