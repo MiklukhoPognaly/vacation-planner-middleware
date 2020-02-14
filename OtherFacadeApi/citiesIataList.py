@@ -23,7 +23,7 @@ class BaseCitiesClass(object):
             self.tzone = self.__get_tzone()
             self.iata = self.__get_iata()
             self.coordinates = self.__get_coordinates()
-            self.name_translations = self.__get_name_translations()
+            self.eng_name = self.__get_english_name()
             self.cases = self.__get_cases()
             self.country_code = self.__get_country_code()
 
@@ -39,14 +39,22 @@ class BaseCitiesClass(object):
         def __get_coordinates(self):
             return self._city_IATA_dict['coordinates']
 
-        def __get_name_translations(self):
-            return self._city_IATA_dict['name_translations']
+        def __get_english_name(self):
+            return self._city_IATA_dict['name_translations']['en']
 
         def __get_cases(self):
             return self._city_IATA_dict['cases']
 
         def __get_country_code(self):
             return self._city_IATA_dict['country_code']
+
+        def form_json(self):
+            return {
+                'name': self.eng_name,
+                'iata': self.iata,
+                'coordinates': self.coordinates,
+            }
+
 
 if __name__ == '__main__':
     response_json = request_cities_iata_list()

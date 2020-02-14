@@ -1,4 +1,4 @@
-from WheatherFacadeApi import wheatherApi as wh
+from WeatherFacadeApi import weatherApi as wh
 from OtherFacadeApi import citiesIataList as cl
 
 
