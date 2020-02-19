@@ -1,5 +1,5 @@
 # coding=utf-8
-import unittest
+import unittest2
 from datetime import datetime
 
 import utils.http_requests
@@ -71,7 +71,7 @@ test_best_prices_data = {
 }
 
 
-class TestIATABaseClass(unittest.TestCase):
+class TestIATABaseClass(unittest2.TestCase):
 
     def setUp(self):
         self._result = api_facade.data_cities.BaseCityClass(_test_data_IATA_CITIES).get_iata()[-1]
@@ -98,7 +98,7 @@ class TestIATABaseClass(unittest.TestCase):
         assert self._result.country_code == 'test'
 
 
-class TestBaseSupportedDirections(unittest.TestCase):
+class TestBaseSupportedDirections(unittest2.TestCase):
     def setUp(self):
         self._result = BaseSupportedDirections(_test_data_supported_directions)
 
@@ -156,7 +156,7 @@ class TestBaseSupportedDirections(unittest.TestCase):
 
 
 
-class TestBestPrices(unittest.TestCase):
+class TestBestPrices(unittest2.TestCase):
     def setUp(self):
         self._result = api_facade.aviasales_min_prices.BaseCalendarPreload(test_best_prices_data)
 
@@ -201,7 +201,7 @@ class TestBestPrices(unittest.TestCase):
 #                                                      "one_way": "true"}).keys()
 
 
-class TestErrorDecorator(unittest.TestCase):
+class TestErrorDecorator(unittest2.TestCase):
     def test_error_http(self):
         with self.assertRaises(Exception):
             utils.http_requests.get_json_raw('http://min-prices.aviasales.ru/calendar_preload',
