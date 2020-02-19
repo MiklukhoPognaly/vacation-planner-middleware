@@ -1,5 +1,6 @@
 requests
 datefinder
-unittests
+unittest2
 pytest
 sqlalchemy
+psycopg2
