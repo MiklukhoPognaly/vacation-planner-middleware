@@ -53,8 +53,8 @@ def getDataFromServer(url):
     return [item for item in httpHelpers.getJsonData(url)]
 
 #Формирование csv файла для импорта данных
-def formCsvFileWithRoutes(route):
-    with open('./data_for_import/{}.csv'.format(route), 'w+') as f:
+def formCsvFileWithRoutes(filename):
+    with open('./data_for_import/{}.csv'.format(filename), 'w+') as f:
         for route in getDataFromServer(_routes):
             f.write(
                 '{},{},{},{},{},{},{}\n'.format(route['airline_iata'],
@@ -66,17 +66,15 @@ def formCsvFileWithRoutes(route):
                                                       route['transfers'])
                     )
 
-def formCsvFileWithIataMapping(route):
-    with open('./data_for_import/{}.csv'.format(route), 'w+') as f:
+def formCsvFileWithIataMapping(filename):
+    with open('./data_for_import/{}.csv'.format(filename), 'w+') as f:
         for mapping in getDataFromServer(_airports):
             f.write(
-                '{},{},{},{},{},{},{}\n'.format(mapping['name'],
+                '{}|{}|{}|{}|{}\n'.format(mapping['name'],
                                                       mapping['flightable'],
                                                       mapping['code'],
-                                                      route['departure_airport_icao'],
-                                                      route['arrival_airport_iata'],
-                                                      route['arrival_airport_icao'],
-                                                      route['transfers'])
+                                                      mapping['country_code'],
+                                                      mapping['city_code'])
                     )
 
 
@@ -92,5 +90,16 @@ def insertRoutesInDatabase():
         cursor.copy_expert(cmd, f)
         eng.commit()
 
+def insertIataMappingInDatabase(filename):
+    with open('./data_for_import/{}.csv'.format(filename), 'r') as f:
+        eng = create_engine(
+            'postgres://{user}:{password}@vacation-planner-library.ciodtn8hce9y.ap-south-1.rds.amazonaws.com:5432/postgres'.format(
+                user="", password="")).raw_connection()
+        cursor = eng.cursor()
+        cmd = 'COPY iata_mapping (name, flightable, code, country_code, city_code) FROM STDIN WITH (FORMAT CSV, HEADER FALSE, delimiter "|")'
+        cursor.copy_expert(cmd, f)
+        eng.commit()
+
 if __name__ == "__main__":
-    insertRoutesInDatabase()
+    formCsvFileWithIataMapping('iata-mapping')
+    insertIataMappingInDatabase('iata-mapping')
