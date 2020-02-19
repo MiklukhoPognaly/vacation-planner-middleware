@@ -10,6 +10,7 @@ def sum_dictionaries(dict1, dict2):
 
 
 def filterFlightByOrigin(origin):
+    #todo: нужно ставить таймауты на вызов mp.get_cheap_prices. Превышаю количество допустимых подключений.
     return [
         mp.get_cheap_prices(iata_town_origin=origin, iata_town_destination=town.iata) for town
         in cl.BaseCitiesClass().towns

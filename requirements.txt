@@ -2,3 +2,4 @@ requests
 datefinder
 unittests
 pytest
+sqlalchemy
