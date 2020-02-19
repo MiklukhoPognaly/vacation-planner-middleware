@@ -19,7 +19,7 @@ session = Session()
 #адреса внешних каталогов
 _routes = 'http://api.travelpayouts.com/data/routes.json'
 _airports = 'http://api.travelpayouts.com/data/ru/airports.json'
-
+_cities = 'http://api.travelpayouts.com/data/cities.json'
 
 #Описание таблиц
 
@@ -48,9 +48,26 @@ class IataMapping(Base):
     city_code = Column(Text)
 
 
+#{"code":"AAA","name":"アナー島","coordinates":{"lon":-145.41667,"lat":-17.05},"time_zone":"Pacific/Tahiti","name_translations":{"en":"Anaa"},"country_code":"PF"}
+class Cities(Base):
+    """ The SQLAlchemy declarative model class for a Airports object. """
+    __tablename__ = 'cities'
+    code = Column(Text, primary_key=True)
+    name_translations = Column(Text)
+    country_code = Column(Text, primary_key=True)
+    coordinates_lon = Column(Integer)
+    coordinates_lat = Column(Integer)
+
+
+
 #Получение данных из сторонних источников
 def getDataFromServer(url):
     return [item for item in httpHelpers.getJsonData(url)]
+
+def getRawDataFromServer(url):
+    return [item for item in httpHelpers.getJsonDataRaw(url)]
+
+
 
 #Формирование csv файла для импорта данных
 def formCsvFileWithRoutes(filename):
@@ -77,6 +94,17 @@ def formCsvFileWithIataMapping(filename):
                                                       mapping['city_code'])
                     )
 
+def formCsvFileWithCities(filename):
+    with open('./data_for_import/{}.csv'.format(filename), 'w+') as f:
+        for city in getRawDataFromServer(_cities):
+            f.write(
+                '{}|{}|{}|{}|{}\n'.format(city['code'],
+                                                      city['name_translations']['en'],
+                                                      city['country_code'],
+                                                      city['coordinates']["lon"],
+                                                      city['coordinates']["lat"])
+                    )
+
 
 
 #Загрузка в базу данных
@@ -100,6 +128,16 @@ def insertIataMappingInDatabase(filename):
         cursor.copy_expert(cmd, f)
         eng.commit()
 
+def insertCitiesInDatabase(filename):
+    with open('./data_for_import/{}.csv'.format(filename), 'r') as f:
+        eng = create_engine(
+            'postgres://{user}:{password}@vacation-planner-library.ciodtn8hce9y.ap-south-1.rds.amazonaws.com:5432/postgres'.format(
+                user="jurybulich22", password="Citibank09")).raw_connection()
+        cursor = eng.cursor()
+        cmd = 'COPY cities (code, name_translations, country_code, coordinates_lon, coordinates_lat) FROM STDIN WITH (FORMAT CSV, HEADER FALSE, delimiter "|")'
+        cursor.copy_expert(cmd, f)
+        eng.commit()
+
 if __name__ == "__main__":
-    formCsvFileWithIataMapping('iata-mapping')
-    insertIataMappingInDatabase('iata-mapping')
+    formCsvFileWithCities('cities')
+    insertCitiesInDatabase('cities')
