@@ -64,10 +64,6 @@ class Cities(Base):
 def getDataFromServer(url):
     return [item for item in httpHelpers.getJsonData(url)]
 
-def getRawDataFromServer(url):
-    return [item for item in httpHelpers.getJsonDataRaw(url)]
-
-
 
 #Формирование csv файла для импорта данных
 def formCsvFileWithRoutes(filename):
@@ -95,15 +91,20 @@ def formCsvFileWithIataMapping(filename):
                     )
 
 def formCsvFileWithCities(filename):
-    with open('./data_for_import/{}.csv'.format(filename), 'w+') as f:
-        for city in getRawDataFromServer(_cities):
-            f.write(
-                '{}|{}|{}|{}|{}\n'.format(city['code'],
-                                                      city['name_translations']['en'],
-                                                      city['country_code'],
-                                                      city['coordinates']["lon"],
-                                                      city['coordinates']["lat"])
-                    )
+    with open('./data_for_import/{}.csv'.format(filename), 'w+', encoding='utf8') as f:
+        for city in getDataFromServer(_cities):
+            name = city['name_translations']['en']
+            code = city['code']
+            country = city['country_code']
+            try:
+                lon = city['coordinates']["lon"]
+            except TypeError:
+                lon = ""
+            try:
+                lat = city['coordinates']["lat"]
+            except TypeError:
+                lat = ""
+            f.write('{}|{}|{}|{}|{}\n'.format(code, name, country, lon, lat))
 
 
 
@@ -132,7 +133,7 @@ def insertCitiesInDatabase(filename):
     with open('./data_for_import/{}.csv'.format(filename), 'r') as f:
         eng = create_engine(
             'postgres://{user}:{password}@vacation-planner-library.ciodtn8hce9y.ap-south-1.rds.amazonaws.com:5432/postgres'.format(
-                user="jurybulich22", password="Citibank09")).raw_connection()
+                user="", password="")).raw_connection()
         cursor = eng.cursor()
         cmd = 'COPY cities (code, name_translations, country_code, coordinates_lon, coordinates_lat) FROM STDIN WITH (FORMAT CSV, HEADER FALSE, delimiter "|")'
         cursor.copy_expert(cmd, f)
