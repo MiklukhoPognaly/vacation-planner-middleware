@@ -1,8 +1,19 @@
 
 
 class BaseSupportedDirections(object):
+    """
+    TO BE DELETED.\n
 
+    A wrapper class on an external method that returns a list of available
+    directions.
+    It contains methods:
+    `self.iata`,
+    `self.name`,
+    `self._raw_data`,
+    `self.coordinates`
+    """
     class __InternalOrigin(object):
+
         def __init__(self, data):
             self._raw_data = data
             self.iata = self.get_iata()
@@ -51,7 +62,6 @@ class BaseSupportedDirections(object):
         def get_weather(self):
             return self._raw_data['weather']
 
-        #todo: создать декоратор для преобразования типов.
         def get_weight(self):
             return int(self._raw_data['weight'])
 
@@ -59,7 +69,6 @@ class BaseSupportedDirections(object):
         self._raw_data = data_supported_directions
         self.origin = self.get_origin()
         self.directions = self.get_directions()
-
 
     def get_origin(self):
         _origin_raw_data = self._raw_data['origin']

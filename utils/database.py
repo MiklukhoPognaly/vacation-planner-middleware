@@ -1,4 +1,3 @@
-from Helpers import httpHelpers
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy import (
@@ -78,7 +77,7 @@ def formCsvFileWithIataMapping(filename):
                     )
 
 
-
+#todo: нужно сделать универсальный метод для формирования и загрузки csv в базу данных
 #Загрузка в базу данных
 def insertRoutesInDatabase():
     with open('./data_for_import/routes.csv', 'r') as f:

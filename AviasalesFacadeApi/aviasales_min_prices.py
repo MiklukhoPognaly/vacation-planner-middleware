@@ -1,9 +1,12 @@
-from datetime import datetime
-from utils.decorators import datetime_formatter_method_decorator, aviasales_api_json_error_decorator
+from utils.decorators import datetime_formatter_method_decorator
 
 
 class BaseCalendarPreload(object):
-    #todo: вынести преобразование формата дат в декоратор.
+    """
+    TO BE DELETED.
+
+    A wrapper class that contains information on the calendar of tickets from an external data source.
+    """
     def __init__(self, raw_data):
         self._raw_data = raw_data
 
@@ -64,13 +67,8 @@ class BaseCalendarPreload(object):
         def get_destination(self):
             return self._raw_data['destination']
 
-
     def get_best_prices(self):
         chunk = []
         for item in self._raw_data['best_prices']:
             chunk.append(BaseCalendarPreload.InternalBestPrices(item))
         return chunk
-
-
-
-

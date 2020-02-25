@@ -1,20 +1,25 @@
-import utils.decorators
-import utils.http_requests
+
 import requests
 
 def get_cheap_prices(iata_town_origin, iata_town_destination):
+    """
+    Retrieves information from http://api.travelpayouts.com/v1/prices/cheap
 
+    :param iata_town_origin:
+
+    :param iata_town_destination:
+
+    :return: BasePricesCheap instance
+    """
 
     response = requests.get("http://api.travelpayouts.com/v1/prices/cheap?origin={}&destination={}&token=1c3aeab21622998c22f5bdc09ef610f6".format(iata_town_origin, iata_town_destination)).json()
     try:
 
-        prices_object = BasePricesCheap(response, iata_town_destination)
+        prices_object = BasePricesCheap(response, iata_town_destination).object_list
     except KeyError:
         print(u'Нет данных для данного маршрута')
     else:
-        return prices_object.prices[-1]
-
-
+        return prices_object
 
 
 class BasePricesLatest(object):
@@ -45,11 +50,11 @@ class BasePricesLatest(object):
         def get_destination(self):
             return self.data['destination']
 
-        @utils.decorators.datetime_formatter_method_decorator()
+
         def get_depart_date(self):
             return self.data['depart_date']
 
-        @utils.decorators.datetime_formatter_method_decorator()
+
         def get_return_date(self):
             return self.data['return_date']
 
@@ -79,10 +84,11 @@ class BasePricesLatest(object):
 
 class BasePricesCheap(object):
     def __init__(self, raw_data, city_iata):
+
         self.data = raw_data
         self.city_iata = city_iata
         self.success = self.get_success()
-        self.prices = self.get_data()
+        self.object_list = self.get_data()
 
     class InternalClassObject(object):
         def __init__(self, data):
@@ -103,15 +109,13 @@ class BasePricesCheap(object):
         def get_flight_number(self):
             return self.data['flight_number']
 
-        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%dT%H:%M:%SZ')
+
         def get_departure_at(self):
             return self.data['departure_at']
 
-        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%dT%H:%M:%SZ')
         def get_return_at(self):
             return self.data['return_at']
 
-        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%dT%H:%M:%SZ')
         def get_expires_at(self):
             return self.data['expires_at']
 
@@ -119,8 +123,9 @@ class BasePricesCheap(object):
         chunk = []
         if self.data['data'] is None:
             raise KeyError
-        for _, raw_data in self.data['data'][self.city_iata].items():
-            chunk.append(BasePricesCheap.InternalClassObject(raw_data))
+        if len(self.data['data'])> 0:
+            for _, raw_data in self.data['data'][self.city_iata].items():
+                chunk.append(BasePricesCheap.InternalClassObject(raw_data))
         return chunk
 
     def get_success(self):
@@ -165,11 +170,9 @@ class BasePricesMonthMatrix(object):
         def __get_destination(self):
             return self.data['destination']
 
-        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%d')
         def __get_depart_date(self):
             return self.data['depart_date']
 
-        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%d')
         def __get_return_date(self):
             return self.data['return_date']
 
@@ -227,15 +230,12 @@ class BasePricesDirect(object):
         def __get_flight_number(self):
             return self.__raw_data['flight_number']
 
-        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%dT%H:%M:%SZ')
         def __get_departure_at(self):
             return self.__raw_data['departure_at']
 
-        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%dT%H:%M:%SZ')
         def __get_return_at(self):
             return self.__raw_data['return_at']
 
-        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%dT%H:%M:%SZ')
         def __get_expires_at(self):
             return self.__raw_data['expires_at']
 
@@ -286,15 +286,12 @@ class BasePricesCalendar(object):
         def __get_flight_number(self):
             return self.data['flight_number']
 
-        @utils.decorators.datetime_formatter_method_decorator("%Y-%m-%dT%H:%M:%SZ")
         def __get_departure_at(self):
             return self.data['departure_at']
 
-        @utils.decorators.datetime_formatter_method_decorator("%Y-%m-%dT%H:%M:%SZ")
         def __get_return_at(self):
             return self.data['return_at']
 
-        @utils.decorators.datetime_formatter_method_decorator("%Y-%m-%dT%H:%M:%SZ")
         def __get_expires_at(self):
             return self.data['expires_at']
 
@@ -336,7 +333,6 @@ class BasePricesNearestPlacesMatrix(object):
         def __get_show_to_affiliates(self):
             return self.data['show_to_affiliates']
 
-        @utils.decorators.datetime_formatter_method_decorator()
         def __get_return_date(self):
             return self.data['return_date']
 
@@ -349,7 +345,6 @@ class BasePricesNearestPlacesMatrix(object):
         def __get_gate(self):
             return self.data['gate']
 
-        @utils.decorators.datetime_formatter_method_decorator('%Y-%m-%dT%H:%M:%SZ')
         def __get_found_at(self):
             return self.data['found_at']
 
@@ -362,7 +357,6 @@ class BasePricesNearestPlacesMatrix(object):
         def __get_destination(self):
             return self.data['destination']
 
-        @utils.decorators.datetime_formatter_method_decorator()
         def __get_depart_date(self):
             return self.data['depart_date']
 
@@ -371,4 +365,5 @@ class BasePricesNearestPlacesMatrix(object):
 
 
 if __name__ == "__main__":
-    print(get_cheap_prices('YBI'))
+    for i in get_cheap_prices('MOW', 'LED'):
+        print(i.data)
