@@ -1,5 +1,4 @@
 import requests
-import unittest
 import json
 
 def getJsonData(url):

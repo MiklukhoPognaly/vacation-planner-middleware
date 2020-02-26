@@ -1,16 +1,10 @@
 from baseClasses import BaseJsonPurifier
-from sqlalchemy.ext.declarative import declarative_base
 import copy
-from sqlalchemy import (
-    Column,
-    Integer,
-    Text
-)
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from AviasalesFacadeApi import aviasales_partner_api
 from WeatherFacadeApi import weatherApi
 import json
+import credentials
 
 def addToDict(dict1=None, dict2=None):
     chunk = {}
@@ -57,7 +51,7 @@ class FormTicketsInfo(BaseJsonPurifier):
 
         engine = create_engine(
         'postgres://{user}:{password}@vacation-planner-library.ciodtn8hce9y.ap-south-1.rds.amazonaws.com:5432/postgres'
-            .format(user="", password=""))
+            .format(user=credentials.DB_LOGIN, password=credentials.DB_PASSWORD))
 
         with engine.connect() as con:
             rs = con.execute(_raw_sql)

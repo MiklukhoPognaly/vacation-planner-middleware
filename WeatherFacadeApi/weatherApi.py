@@ -1,5 +1,5 @@
 import requests
-
+import credentials
 #todo: добавить обработку ошибок, {'code': 615, 'type': 'request_failed', 'info': 'Your API request failed. Please try again or contact support.'}
 class WeatherApiDataFacade(object):
     def __init__(self, data):
@@ -57,7 +57,7 @@ class WeatherApiDataFacade(object):
 
 
 def weather_data(en_city_name, url='http://api.weatherstack.com/current'):
-    _required_data = {"access_key": "51f4c2edda095011cdf4c5c124074567", "query": en_city_name, "units": "m"}
+    _required_data = {"access_key": credentials.WEATHERSTACK_TOKEN, "query": en_city_name, "units": "m"}
     response_json = requests.get(url, params=_required_data).json()
     return WeatherApiDataFacade(response_json)
 

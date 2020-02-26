@@ -1,4 +1,4 @@
-
+import credentials
 import requests
 
 def get_cheap_prices(iata_town_origin, iata_town_destination):
@@ -12,7 +12,9 @@ def get_cheap_prices(iata_town_origin, iata_town_destination):
     :return: BasePricesCheap instance
     """
 
-    response = requests.get("http://api.travelpayouts.com/v1/prices/cheap?origin={}&destination={}&token=1c3aeab21622998c22f5bdc09ef610f6".format(iata_town_origin, iata_town_destination)).json()
+    response = requests.get("http://api.travelpayouts.com/v1/prices/cheap?origin={}&destination={}&token={token}"
+                            .format(iata_town_origin, iata_town_destination, token=credentials.TRAVELPAYOUTS_TOKEN))\
+        .json()
     try:
 
         prices_object = BasePricesCheap(response, iata_town_destination).object_list
