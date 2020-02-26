@@ -4,26 +4,55 @@ import requests
 class WeatherApiDataFacade(object):
     def __init__(self, data):
         self.__raw_data = data
-        if not self.__raw_data['success']:
-            raise TypeError('{}'.format(self.__raw_data['error']['info']))
+        if 'success' in self.__raw_data:
+            print('{}'.format(self.__raw_data['error']['info']))
         #self.country = self.__get_country()
         self.temperature = self.__get_temperature()
         self.feelslike = self.__get_feelslike_temparature()
+        self.lat = self.__get_lat()
+        self.lon = self.__get_lon()
+        self.country = self.__get_country()
 
    #def __get_country(self):
         #return self.__raw_data['location']['country']
 
     def __get_temperature(self):
-        return self.__raw_data['current']['temperature']
+        try:
+            return self.__raw_data['current']['temperature']
+        except KeyError:
+            return ""
 
     def __get_feelslike_temparature(self):
-        return self.__raw_data['current']['feelslike']
+        try:
+            return self.__raw_data['current']['feelslike']
+        except KeyError:
+            return ""
+
+    def __get_lat(self):
+        try:
+            return self.__raw_data['location']['lat']
+        except KeyError:
+            return ""
+
+    def __get_lon(self):
+        try:
+            return self.__raw_data['location']['lon']
+        except KeyError:
+            return ""
+
+    def __get_country(self):
+        try:
+            return self.__raw_data['location']['country']
+        except KeyError:
+            return ""
 
     def form_json(self):
         return {
-            #"country": self.country,
+            "country": self.country,
             "temperature": self.temperature,
-            "feelslike": self.feelslike
+            "feelslike": self.feelslike,
+            "lat": self.lat,
+            "lon": self.lon
         }
 
 

@@ -1,6 +1,6 @@
-from vacation_planner import baseClasses
+from baseClasses import BaseJsonPurifier
 from sqlalchemy.ext.declarative import declarative_base
-
+import copy
 from sqlalchemy import (
     Column,
     Integer,
@@ -8,22 +8,34 @@ from sqlalchemy import (
 )
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from vacation_planner.AviasalesFacadeApi import aviasales_partner_api
-from vacation_planner.WeatherFacadeApi import weatherApi
+from AviasalesFacadeApi import aviasales_partner_api
+from WeatherFacadeApi import weatherApi
+import json
 
+def addToDict(dict1=None, dict2=None):
+    chunk = {}
+    if not dict1:
+        dict1 = {}
+    if not dict2:
+        dict2 = {}
+    chunk.update(dict1)
+    chunk.update(dict2)
+    return chunk
 
-class FormTicketsInfo(baseClasses.BaseJsonPurifier):
+class FormTicketsInfo(BaseJsonPurifier):
     """
     Class for generating information on tickets from the database and weather methods
     """
-    def __init__(self, origin_iata):
-        self.origin = origin_iata
-        self.routes = []
-        self.aviasales = []
+    def __init__(self, origin_iata, getRoutes=True, getFlyInfo=True, getWeatherData=True):
+        if getRoutes:
+            routes = self._get_db_routes(origin_iata)
+        if getFlyInfo:
+            fly_info = self._get_data_from_aviasales(origin=origin_iata, routes=routes)
+        if getWeatherData:
+            self.data = self._get_weather_info(fly_info)
 
-
-    def __get_db_routes(self):
-
+    def _get_db_routes(self, origin_iata):
+        alist = []
         _raw_sql = "Select " \
                    "a.arrival_city_iata" \
                    ",b.name_translations as arrival_city_name " \
@@ -40,45 +52,52 @@ class FormTicketsInfo(baseClasses.BaseJsonPurifier):
                    ") a inner join public.cities b " \
                    "on a.arrival_city_iata = b.code " \
                    "inner join public.cities c " \
-                   "on a.departure_city_iata = c.code".format(origin=self.origin)
+                   "on a.departure_city_iata = c.code".format(origin=origin_iata)
 
 
         engine = create_engine(
-        'postgres://{user}:{password}@vacation-planner-library.ciodtn8hce9y.ap-south-1.rds.amazonaws.com:5432/postgres'.format(user="jurybulich22", password="Citibank09"))
+        'postgres://{user}:{password}@vacation-planner-library.ciodtn8hce9y.ap-south-1.rds.amazonaws.com:5432/postgres'
+            .format(user="", password=""))
 
         with engine.connect() as con:
             rs = con.execute(_raw_sql)
-
             for row in rs:
-                self.routes.append({"arrival_iata": row[0], "name": row[1]})
+                alist.append({"arrival_iata": row[0], "name": row[1]})
         print('данные из базы получены')
-        return self
+        return alist
 
-    def __get_data_from_aviasales(self):
-        if self.routes:
-            for route in self.routes:
-                for item in aviasales_partner_api.get_cheap_prices(self.origin, route['arrival_iata']):
+    def _get_data_from_aviasales(self, origin, routes):
+        print('Начало получения данных из внешнего источника aviasales')
+        alist = []
+        if routes:
+            for route in routes:
+                for item in aviasales_partner_api.get_cheap_prices(origin, route['arrival_iata']):
                     item.data.update(route)
-                    self.aviasales.append(item.data)
-        print('данные от aviasales получены')
-        return self
+                    alist.append(item.data)
+        print('Данные от aviasales получены')
+        return alist
 
-    def get_weather_info(self):
-        self.__get_db_routes()
-        self.__get_data_from_aviasales()
-        for item in self.aviasales[:5]:
-            weatherApi.weather_data(item['name'])
+    def _get_weather_info(self, fly_info):
+        alist = []
+        print('Начало получения данных по погоде и локации')
+        for item in fly_info:
+            weather_json = weatherApi.weather_data(item['name']).form_json()
+            aviasales_item = copy.deepcopy(item)
+            alist.append(addToDict(weather_json, aviasales_item))
+        print('Финальные данные получены')
+        return alist
 
+    def get_raw_data(self):
+        return self.data
 
-
-    def form_json(self):
-        self.__get_db_routes().__get_data_from_aviasales()
-
-
-
-
+    def form_json(self, path, filename, data=None):
+        if data is None:
+            data = self.data
+        with open("{path}/{filename}".format(path=path, filename=filename), "w+") as wf:
+            print('Начало записи в файл {path}/{filename}'.format(path=path, filename=filename))
+            json.dump(data, wf)
 
 
 if __name__ == "__main__":
     inst = FormTicketsInfo("MOW")
-    inst.get_weather_info()
+    inst.form_json('.', 'fly_info_with_weather.json')
