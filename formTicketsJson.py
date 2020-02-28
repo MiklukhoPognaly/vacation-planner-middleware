@@ -91,7 +91,23 @@ class FormTicketsInfo(BaseJsonPurifier):
             print('Начало записи в файл {path}/{filename}'.format(path=path, filename=filename))
             json.dump(data, wf)
 
+    def form_json_to_elasticsearch(self, path, filename, data=None):
+        if data and isinstance(data, list):
+            if not len(data):
+                raise ValueError('{data} should have values'.format(data=data))
+            if not isinstance(data[0], dict):
+                raise ValueError('{data} should contain dictionary'.format(data=data))
+            _alist = data
+        else:
+            _alist = self.get_raw_data()
+
+        with open("{path}/{filename}".format(path=path, filename=filename), "w+") as wf:
+            for index in range(0, len(_alist)):
+                _meta = '{{"index" : {{ "_index" : "aviasales", "_id" : "{id}" }}'.format(id=index+1)
+                _doc = json.dumps(_alist[index])
+                _str = _meta+'\n'+_doc+'\n'
+                wf.write(_str)
 
 if __name__ == "__main__":
     inst = FormTicketsInfo("MOW")
-    inst.form_json('.', 'fly_info_with_weather.json')
+    inst.form_json_to_elasticsearch('.', '_bulk_fly_info_with_weather.json')
