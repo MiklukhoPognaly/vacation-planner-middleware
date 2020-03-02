@@ -12,7 +12,7 @@ def get_cheap_prices(iata_town_origin, iata_town_destination):
     :return: BasePricesCheap instance
     """
 
-    response = requests.get("http://api.travelpayouts.com/v1/prices/cheap?origin={}&destination={}&token={token}"
+    response = requests.get("http://api.travelpayouts.com/v1/prices/cheap?currency=RUB&origin={}&destination={}&token={token}"
                             .format(iata_town_origin, iata_town_destination, token=credentials.TRAVELPAYOUTS_TOKEN))\
         .json()
     try:
