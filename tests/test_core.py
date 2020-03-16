@@ -3,7 +3,6 @@ import unittest2
 from datetime import datetime
 
 import utils.http_requests
-from AviasalesFacadeApi.aviasales_map_supported_directions import BaseSupportedDirections
 import utils.http_requests
 
 def test_get_IATA_list():
@@ -97,62 +96,6 @@ class TestIATABaseClass(unittest2.TestCase):
     def test_country_code(self):
         assert self._result.country_code == 'test'
 
-
-class TestBaseSupportedDirections(unittest2.TestCase):
-    def setUp(self):
-        self._result = BaseSupportedDirections(_test_data_supported_directions)
-
-    def test_get_origin_iata(self):
-        assert self._result.get_origin().iata == "LED"
-
-    def test_get_origin_name(self):
-        assert self._result \
-            .get_origin() \
-            .name == "Санкт-Петербург"
-
-    def test_get_origin_country(self):
-        assert self._result \
-            .get_origin() \
-            .country == "RU"
-
-    def test_get_origin_coordinates(self):
-        assert self._result \
-            .get_origin() \
-            .coordinates == [30.315785, 59.939039]
-
-    def test_directions_direct(self):
-        assert self._result \
-            .get_directions()[0] \
-            .direct == 'true'
-
-    def test_directions_iata(self):
-        assert self._result \
-            .get_directions()[0] \
-            .iata == 'AAQ'
-
-    def test_directions_name(self):
-        assert self._result \
-            .get_directions()[0] \
-            .name == 'Анапа'
-
-    def test_directions_country(self):
-        assert self._result \
-            .get_directions()[0] \
-            .country == 'RU'
-
-    def test_directions_coordinates(self):
-        assert self._result \
-            .get_directions()[0] \
-            .coordinates == [37.316666, 44.9]
-
-    def test_directions_weight(self):
-        assert self._result \
-                   .get_directions()[0] \
-                   .weight == 0
-
-    #todo:создать отдельный класс для обертки "weather": {}
-    def test_directions_weather(self):
-        assert self._result.get_directions()[0].weather['weathertype'] == 'null'
 
 
 

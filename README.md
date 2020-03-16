@@ -1,1 +1,4 @@
-# vacation_planner_backend
+# AviasalesFacadeApi
+
+# AviasalesFacadeApi.aviasales_map_supported_directions
+

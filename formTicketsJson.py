@@ -1,8 +1,7 @@
 from baseClasses import BaseJsonPurifier
 import copy
 from sqlalchemy import create_engine
-from AviasalesFacadeApi import aviasales_partner_api
-from WeatherFacadeApi import weatherApi
+from DataMappers import weather_mapper, flytickets_mapper
 import json
 import credentials
 
@@ -65,7 +64,7 @@ class FormTicketsInfo(BaseJsonPurifier):
         alist = []
         if routes:
             for route in routes:
-                for item in aviasales_partner_api.get_cheap_prices(origin, route['arrival_iata']):
+                for item in flytickets_mapper.get_cheap_prices(origin, route['arrival_iata']):
                     item.data.update(route)
                     alist.append(item.data)
         print('Данные от aviasales получены')
@@ -75,7 +74,7 @@ class FormTicketsInfo(BaseJsonPurifier):
         alist = []
         print('Начало получения данных по погоде и локации')
         for item in fly_info:
-            weather_json = weatherApi.weather_data(item['name']).form_json()
+            weather_json = weather_mapper.weather_data(item['name']).form_json()
             aviasales_item = copy.deepcopy(item)
             alist.append(addToDict(weather_json, aviasales_item))
         print('Финальные данные получены')
@@ -110,4 +109,4 @@ class FormTicketsInfo(BaseJsonPurifier):
 
 if __name__ == "__main__":
     inst = FormTicketsInfo("MOW")
-    inst.form_json_to_elasticsearch('.', '_bulk_fly_info_with_weather.json')
+    inst.form_json('./Services', 'fly_info_with_weather.json')

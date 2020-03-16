@@ -1,6 +1,6 @@
 import unittest2 as unittest
 from datetime import datetime
-from AviasalesFacadeApi.aviasales_partner_api import BasePricesLatest, BasePricesCheap\
+from DataMappers.flytickets_mapper import BasePricesLatest, BasePricesCheap\
     , BasePricesMonthMatrix, BasePricesDirect, BasePricesCalendar, BasePricesNearestPlacesMatrix
 
 
