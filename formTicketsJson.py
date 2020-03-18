@@ -1,4 +1,4 @@
-from baseClasses import BaseJsonPurifier
+
 import copy
 from sqlalchemy import create_engine
 from DataMappers import weather_mapper, flytickets_mapper
@@ -15,98 +15,172 @@ def addToDict(dict1=None, dict2=None):
     chunk.update(dict2)
     return chunk
 
-class FormTicketsInfo(BaseJsonPurifier):
+from abc import ABC, abstractmethod
+
+class Builder(ABC):
     """
-    Class for generating information on tickets from the database and weather methods
+    Интерфейс Строителя объявляет создающие методы для различных частей объектов
+    Продуктов.
     """
-    def __init__(self, origin_iata, getRoutes=True, getFlyInfo=True, getWeatherData=True):
-        if getRoutes:
-            routes = self._get_db_routes(origin_iata)
-        if getFlyInfo:
-            fly_info = self._get_data_from_aviasales(origin=origin_iata, routes=routes)
-        if getWeatherData:
-            self.data = self._get_weather_info(fly_info)
 
-    def _get_db_routes(self, origin_iata):
-        alist = []
-        _raw_sql = "Select " \
-                   "a.arrival_city_iata" \
-                   ",b.name_translations as arrival_city_name " \
-                   "from ( " \
-                   "Select distinct " \
-                   "b.city_code as departure_city_iata " \
-                   ",c.city_code as arrival_city_iata " \
-                   "from public.routes as a " \
-                   "inner join public.iata_mapping as b " \
-                   "on a.departure_airport_iata = b.code " \
-                   "inner join public.iata_mapping as c " \
-                   "on a.arrival_airport_iata = c.code " \
-                   "where b.city_code = '{origin}' " \
-                   ") a inner join public.cities b " \
-                   "on a.arrival_city_iata = b.code " \
-                   "inner join public.cities c " \
-                   "on a.departure_city_iata = c.code".format(origin=origin_iata)
+    @abstractmethod
+    def product(self) -> None:
+        pass
+
+    @abstractmethod
+    def produce_part_a(self) -> None:
+        pass
+
+    @abstractmethod
+    def produce_part_b(self) -> None:
+        pass
+
+    @abstractmethod
+    def produce_part_c(self) -> None:
+        pass
+
+    @abstractmethod
+    def produce_part_d(self) -> None:
+        pass
+
+class ConcreteBuilder1(Builder):
+    """
+    Классы Конкретного Строителя следуют интерфейсу Строителя и предоставляют
+    конкретные реализации шагов построения. Ваша программа может иметь несколько
+    вариантов Строителей, реализованных по-разному.
+    """
+
+    def __init__(self) -> None:
+        """
+        Новый экземпляр строителя должен содержать пустой объект продукта,
+        который используется в дальнейшей сборке.
+        """
+        self.reset()
+
+    def reset(self) -> None:
+        self._product = Product1()
+
+    @property
+    def product(self):
+        """
+        Конкретные Строители должны предоставить свои собственные методы
+        получения результатов. Это связано с тем, что различные типы строителей
+        могут создавать совершенно разные продукты с разными интерфейсами.
+        Поэтому такие методы не могут быть объявлены в базовом интерфейсе
+        Строителя (по крайней мере, в статически типизированном языке
+        программирования).
+
+        Как правило, после возвращения конечного результата клиенту, экземпляр
+        строителя должен быть готов к началу производства следующего продукта.
+        Поэтому обычной практикой является вызов метода сброса в конце тела
+        метода getProduct. Однако такое поведение не является обязательным, вы
+        можете заставить своих строителей ждать явного запроса на сброс из кода
+        клиента, прежде чем избавиться от предыдущего результата.
+        """
+        product = self._product
+        self.reset()
+        return product
+
+    def produce_part_a(self) -> None:
+        self._product.form_db_list_with_routes(engine=_engine, sql=_sql)
+
+    def produce_part_b(self) -> None:
+        self._product.form_list_with_cheap_ticket_flights('MOW')
+
+    def produce_part_c(self) -> None:
+        self._product.form_list_with_weather_info()
+
+    def produce_part_d(self) -> None:
+        self._product.make_file(directory='./Services', filename='fly_info_with_weather.json')
 
 
-        engine = create_engine(
-        'postgres://{user}:{password}@vacation-planner-library.ciodtn8hce9y.ap-south-1.rds.amazonaws.com:5432/postgres'
-            .format(user=credentials.DB_LOGIN, password=credentials.DB_PASSWORD))
+_sql = "Select a.arrival_city_iata,b.name_translations as arrival_city_name from ( Select distinct b.city_code as departure_city_iata ,c.city_code as arrival_city_iata from public.routes as a inner join public.iata_mapping as b on a.departure_airport_iata = b.code inner join public.iata_mapping as c on a.arrival_airport_iata = c.code where b.city_code = '{origin}' ) a inner join public.cities b on a.arrival_city_iata = b.code inner join public.cities c on a.departure_city_iata = c.code".format(origin="MOW")
+_conn_string = 'postgres://{user}:{password}@vacation-planner-library.ciodtn8hce9y.ap-south-1.rds.amazonaws.com:5432/postgres'.format(user=credentials.DB_LOGIN, password=credentials.DB_PASSWORD)
+_engine = create_engine(_conn_string)
+
+
+class Product1():
+    """
+    В методах продукта содержатся все необходимые для получения готового результата методы. 1) Он делает запрос к базе
+    данных 2) Запрашивает внешний api для поиска билетов 3)...
+    """
+
+    def __init__(self) -> None:
+        self._routes = []
+        self._flights = []
+        self._weather = []
+
+    def form_db_list_with_routes(self, engine: any, sql: str) -> None:
 
         with engine.connect() as con:
-            rs = con.execute(_raw_sql)
+            rs = con.execute(sql)
             for row in rs:
-                alist.append({"arrival_iata": row[0], "name": row[1]})
-        print('данные из базы получены')
-        return alist
+                self._routes.append(
+                    {
+                        "arrival_iata": row[0]
+                        , "name": row[1]
+                    }
+                )
 
-    def _get_data_from_aviasales(self, origin, routes):
-        print('Начало получения данных из внешнего источника aviasales')
-        alist = []
-        if routes:
-            for route in routes:
+    def form_list_with_cheap_ticket_flights(self, origin: str) -> None:
+        if self._routes:
+            for route in self._routes:
                 for item in flytickets_mapper.get_cheap_prices(origin, route['arrival_iata']):
                     item.data.update(route)
-                    alist.append(item.data)
-        print('Данные от aviasales получены')
-        return alist
+                    self._flights.append(item.data)
 
-    def _get_weather_info(self, fly_info):
-        alist = []
-        print('Начало получения данных по погоде и локации')
-        for item in fly_info:
+    def form_list_with_weather_info(self) -> None:
+        for item in self._flights:
             weather_json = weather_mapper.weather_data(item['name']).form_json()
             aviasales_item = copy.deepcopy(item)
-            alist.append(addToDict(weather_json, aviasales_item))
-        print('Финальные данные получены')
-        return alist
+            self._weather.append(addToDict(weather_json, aviasales_item))
 
-    def get_raw_data(self):
-        return self.data
+    def make_file(self, directory: str, filename: str):
+        with open("{path}/{filename}".format(path=directory, filename=filename), "w+") as wf:
+            json.dump(self._weather, wf)
 
-    def form_json(self, path, filename, data=None):
-        if data is None:
-            data = self.data
-        with open("{path}/{filename}".format(path=path, filename=filename), "w+") as wf:
-            print('Начало записи в файл {path}/{filename}'.format(path=path, filename=filename))
-            json.dump(data, wf)
+class Director:
+    """
+    Директор отвечает только за выполнение шагов построения в определённой
+    последовательности. Это полезно при производстве продуктов в определённом
+    порядке или особой конфигурации. Строго говоря, класс Директор необязателен,
+    так как клиент может напрямую управлять строителями.
+    """
 
-    def form_json_to_elasticsearch(self, path, filename, data=None):
-        if data and isinstance(data, list):
-            if not len(data):
-                raise ValueError('{data} should have values'.format(data=data))
-            if not isinstance(data[0], dict):
-                raise ValueError('{data} should contain dictionary'.format(data=data))
-            _alist = data
-        else:
-            _alist = self.get_raw_data()
+    def __init__(self) -> None:
+        self._builder = None
 
-        with open("{path}/{filename}".format(path=path, filename=filename), "w+") as wf:
-            for index in range(0, len(_alist)):
-                _meta = '{{"index" : {{ "_index" : "aviasales", "_id" : "{id}" }}'.format(id=index+1)
-                _doc = json.dumps(_alist[index])
-                _str = _meta+'\n'+_doc+'\n'
-                wf.write(_str)
+    @property
+    def builder(self) -> Builder:
+        return self._builder
+
+    @builder.setter
+    def builder(self, builder: Builder) -> None:
+        """
+        Директор работает с любым экземпляром строителя, который передаётся ему
+        клиентским кодом. Таким образом, клиентский код может изменить конечный
+        тип вновь собираемого продукта.
+        """
+        self._builder = builder
+
+    """
+    Директор может строить несколько вариаций продукта, используя одинаковые
+    шаги построения.
+    """
+
+    def build_file_to_upload(self) -> None:
+        self.builder.produce_part_a()
+        self.builder.produce_part_b()
+        self.builder.produce_part_c()
+        self.builder.produce_part_d()
+
+
 
 if __name__ == "__main__":
-    inst = FormTicketsInfo("MOW")
-    inst.form_json('./Services', 'fly_info_with_weather.json')
+
+    director = Director()
+    builder = ConcreteBuilder1()
+    director.builder = builder
+
+    director.build_file_to_upload()
+

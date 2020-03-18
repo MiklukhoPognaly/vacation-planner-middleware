@@ -1,11 +1,7 @@
 import requests
 import json
 
-#curl -X POST "localhost:9200/_bulk?pretty" -H 'Content-Type: application/json' -d
-#curl -X POST "localhost:9200/_bulk?pretty" -H 'Content-Type: application/json' -d'
 
-#!/usr/bin/env python3
-#-*- coding: utf-8 -*-
 from elasticsearch import Elasticsearch, helpers
 import os, uuid
 
@@ -38,6 +34,7 @@ def get_data_from_file(self, path=script_path()):
 make a mapping for file
 '''
 def setup_mapping(index, body, doc_type,):
+
     elastic.indices.put_mapping(
         index=index,
         doc_type=doc_type,
@@ -68,22 +65,102 @@ def delete_all(url=r"https://search-vacationplanner-pu2vusfddg2zccevu5vwkzr74y.a
     return _r.text
 
 
+# Get current mapping
+def display_current_mapping(base_url, old_index, changed_mapping):
+    r = requests.get('{base_url}/{index_name}'.format(base_url=base_url, index_name=old_index))
+    r.raise_for_status()
+    content = r.json()
+    mappings = content[old_index]['mappings']
+    mappings['properties'].update(changed_mapping)
+    return mappings
+
+# ------------------------------------------------
+# Create a new index with the correct mappings
+def create_index(base_url, new_index, mappings):
+    r = requests.put('{base_url}/{index_name}'.format(base_url=base_url, index_name=new_index), json={
+        'mappings': mappings
+    })
+    r.raise_for_status()
+    return
+
+# ------------------------------------------------
+# Reindex
+def perform_reindex(base_url, old_index, new_index):
+    r = requests.post('{base_url}/_reindex'.format(base_url=base_url), json={
+        "source": {
+            "index": old_index
+        },
+        "dest": {
+            "index": new_index
+        }
+    })
+    r.raise_for_status()
+    return
+
+# ------------------------------------------------
+# Delete the old index
+def delete_index(base_url, old_index):
+    r = requests.delete('{base_url}/{index_name}'.format(base_url=base_url, index_name=old_index))
+    r.raise_for_status()
+    return
+
+# ------------------------------------------------
+# Create an alias (so that on next time this will be easier to do without downtime)
+def create_alias(base_url, new_index, old_index):
+    r = requests.post('{base_url}/_aliases'.format(base_url=base_url), json={
+        "actions": [
+            {"add": {
+                "alias": old_index,
+                "index": new_index
+            }}
+        ]
+    })
+    r.raise_for_status()
+    return
+
+class PerformUpload():
+    '''
+    Клиентский класс для загрузки файлов в индекс ElasticSearch
+    '''
+    def __init__(self, elastic_url: str, mapping: dict):
+        self._mapping = mapping
+        self._client = None
+        self._base_url_elastic = elastic_url
+
+    @property
+    def mapping(self) -> dict:
+        return self._mapping
+
+    @mapping.setter
+    def mapping(self, new_mapping: dict) -> None:
+        self._mapping = new_mapping
+
+    @property
+    def elastic_client(self) -> Elasticsearch:
+        return self._client
+
+    @elastic_client.setter
+    def elastic_client(self, client: Elasticsearch) -> None:
+        self._client = client
+
+    def perform_del_index(self, index_name: str):
+        delete_index(base_url=self._base_url_elastic, old_index=index_name)
+        return self
+
+    def perform_upload(self, filename_path: str, index_name: str, doc_type: str):
+        try:
+            response = helpers.bulk(self._client, bulk_json_data(filename_path, index_name, doc_type))
+            setup_mapping(index=index_name, doc_type=doc_type, body=self.mapping)
+            print("\nbulk_json_data() RESPONSE:", response)
+        except Exception as e:
+            print("\nERROR:", e)
+        return self
+
+
+
+
 if __name__ == "__main__":
 
-    # airline text
-    # arrival_iata text
-    # country text
-    # departure_at date
-    # expires_at date
-    # feelslike text
-    # flight_number long
-    # lat text
-    # lon text
-    # name text
-    # price long
-    # return_at date
-    # temperature text
-    #print(delete_all())
     mapping = {
             "properties": {
                 "airline": {"type": "text"},
@@ -101,12 +178,9 @@ if __name__ == "__main__":
                 "temperature": {"type": "long"}
             }
         }
-    try:
-        # make the bulk call, and get a response
-        index = "aviasales"
-        doc_type = "fly_info"
-        response = helpers.bulk(elastic, bulk_json_data("../fly_info_with_weather.json", "aviasales", "fly_info"))
-        setup_mapping(index=index, doc_type=doc_type, body=mapping)
-        print("\nbulk_json_data() RESPONSE:", response)
-    except Exception as e:
-        print("\nERROR:", e)
+    Upload = PerformUpload(elastic_url='https://search-vacationplanner-pu2vusfddg2zccevu5vwkzr74y.ap-south-1.es.amazonaws.com', mapping=mapping)
+    Upload.elastic_client = elastic
+    Upload\
+        .perform_del_index('aviasales')\
+        .perform_upload(filename_path="../fly_info_with_weather.json", doc_type="fly_info", index_name="aviasales")
+
