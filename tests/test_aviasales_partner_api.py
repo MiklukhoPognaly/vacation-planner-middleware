@@ -1,6 +1,6 @@
 import unittest2 as unittest
 from datetime import datetime
-from DataMappers.flytickets_mapper import BasePricesLatest, BasePricesCheap\
+from mapping.flytickets_mapper import BasePricesLatest, BasePricesCheap\
     , BasePricesMonthMatrix, BasePricesDirect, BasePricesCalendar, BasePricesNearestPlacesMatrix
 
 

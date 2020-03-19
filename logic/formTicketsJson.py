@@ -1,19 +1,10 @@
 
 import copy
 from sqlalchemy import create_engine
-from DataMappers import weather_mapper, flytickets_mapper
+from mapping import weather_mapper, flytickets_mapper
 import json
 import credentials
-
-def addToDict(dict1=None, dict2=None):
-    chunk = {}
-    if not dict1:
-        dict1 = {}
-    if not dict2:
-        dict2 = {}
-    chunk.update(dict1)
-    chunk.update(dict2)
-    return chunk
+from utils.helpers import Mdict, run_sql_file
 
 from abc import ABC, abstractmethod
 
@@ -82,7 +73,7 @@ class ConcreteBuilder1(Builder):
         return product
 
     def produce_part_a(self) -> None:
-        self._product.form_db_list_with_routes(engine=_engine, sql=_sql)
+        self._product.form_db_list_with_routes()
 
     def produce_part_b(self) -> None:
         self._product.form_list_with_cheap_ticket_flights('MOW')
@@ -91,7 +82,7 @@ class ConcreteBuilder1(Builder):
         self._product.form_list_with_weather_info()
 
     def produce_part_d(self) -> None:
-        self._product.make_file(directory='./Services', filename='fly_info_with_weather.json')
+        self._product.make_file(directory='../files/Moscow', filename='MOW_weather_tickets.json')
 
 
 _sql = "Select a.arrival_city_iata,b.name_translations as arrival_city_name from ( Select distinct b.city_code as departure_city_iata ,c.city_code as arrival_city_iata from public.routes as a inner join public.iata_mapping as b on a.departure_airport_iata = b.code inner join public.iata_mapping as c on a.arrival_airport_iata = c.code where b.city_code = '{origin}' ) a inner join public.cities b on a.arrival_city_iata = b.code inner join public.cities c on a.departure_city_iata = c.code".format(origin="MOW")
@@ -110,17 +101,16 @@ class Product1():
         self._flights = []
         self._weather = []
 
-    def form_db_list_with_routes(self, engine: any, sql: str) -> None:
+    def form_db_list_with_routes(self) -> None:
 
-        with engine.connect() as con:
-            rs = con.execute(sql)
-            for row in rs:
-                self._routes.append(
-                    {
-                        "arrival_iata": row[0]
-                        , "name": row[1]
-                    }
-                )
+        rs = run_sql_file('../sql/get_routes_moscow.sql', credentials.DATABASE_ENDPOINT)
+        for row in rs:
+            self._routes.append(
+                {
+                    "arrival_iata": row[0]
+                    , "name": row[1]
+                }
+            )
 
     def form_list_with_cheap_ticket_flights(self, origin: str) -> None:
         if self._routes:
@@ -133,7 +123,7 @@ class Product1():
         for item in self._flights:
             weather_json = weather_mapper.weather_data(item['name']).form_json()
             aviasales_item = copy.deepcopy(item)
-            self._weather.append(addToDict(weather_json, aviasales_item))
+            self._weather.append(Mdict(weather_json) + Mdict(aviasales_item))
 
     def make_file(self, directory: str, filename: str):
         with open("{path}/{filename}".format(path=directory, filename=filename), "w+") as wf:
