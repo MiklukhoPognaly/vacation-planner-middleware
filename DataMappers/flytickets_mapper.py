@@ -197,6 +197,7 @@ class BasePricesMonthMatrix(object):
     def __get_success(self):
         return self.__raw_data['success']
 
+
 class BasePricesDirect(object):
     def __init__(self, data, destination):
         self.destination = destination
