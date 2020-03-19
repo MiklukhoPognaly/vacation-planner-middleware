@@ -2,11 +2,12 @@
 import unittest2
 from datetime import datetime
 
+import utils.helpers
 import utils.http_requests
 import utils.http_requests
 
 def test_get_IATA_list():
-    result = utils.http_requests.get_json('http://api.travelpayouts.com/data/ru/cities.json')
+    result = utils.helpers.get_json('http://api.travelpayouts.com/data/ru/cities.json')
     assert isinstance(result, (type([])))
 
 
