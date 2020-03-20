@@ -106,12 +106,7 @@ class Product1:
         filepath = pathlib.Path.home()/'PyCharmProjects'/'vacation-planner'/'vacation_planner'/'sql'/'get_routes_moscow.sql'
         rs = run_sql_file(filename=filepath, conn_sring=credentials.DATABASE_ENDPOINT)
         for row in rs:
-            self._routes.append(
-                {
-                    "arrival_iata": row[0]
-                    , "name": row[1]
-                }
-            )
+            self._routes.append(row)
 
     def form_list_with_cheap_ticket_flights(self, origin: str) -> None:
         if self._routes:
