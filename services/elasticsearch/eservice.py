@@ -165,6 +165,7 @@ def create_alias(base_url, new_index, old_index):
     r.raise_for_status()
     return
 
+
 class PerformUpload:
     """
     Клиентский класс для загрузки файлов в индекс elasticsearch
@@ -197,6 +198,10 @@ class PerformUpload:
     def perform_upload(self, filename_path: str, index_name: str, doc_type: str):
         if not self._client:
             self._client = Elasticsearch(el)
+
+        if self._client.indices.exists(index=index_name):
+            self.perform_del_index(index_name)
+
         try:
             response = helpers.bulk(self._client, bulk_json_data(filename_path, index_name, doc_type))
             setup_mapping(index=index_name, doc_type=doc_type, body=self.mapping)

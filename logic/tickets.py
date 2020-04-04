@@ -4,7 +4,7 @@ import json
 import credentials
 from utils.helpers import Mdict, run_sql_file
 from abc import ABC, abstractmethod
-import pathlib
+import config
 
 class Builder(ABC):
     """
@@ -82,12 +82,7 @@ class ConcreteBuilder1(Builder):
 
     def produce_part_d(self) -> None:
         self._product.make_file(
-            directory=pathlib.Path.home()/
-                      'PyCharmProjects'/
-                      'vacation-planner'/
-                      'vacation_planner'/
-                      'files'/
-                      'Moscow', filename='MOW_weather_tickets.json')
+            directory=config.UPLOAD_FILE, filename='MOW_weather_tickets.json')
 
 
 class Product1:
@@ -103,7 +98,8 @@ class Product1:
 
     def form_db_list_with_routes(self) -> None:
 
-        filepath = pathlib.Path.home()/'PyCharmProjects'/'vacation-planner'/'vacation_planner'/'sql'/'get_routes_moscow.sql'
+        # filepath = pathlib.Path.home()/'PyCharmProjects'/'vacation-planner'/'vacation_planner'/'sql'/'get_routes_moscow.sql'
+        filepath = config.SQL_FILE
         rs = run_sql_file(filename=filepath, conn_sring=credentials.DATABASE_ENDPOINT)
         for row in rs:
             self._routes.append(row)
