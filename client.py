@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from logic import tickets
 from services.elasticsearch import eservice
 import os
