@@ -5,3 +5,4 @@ pytest
 sqlalchemy
 psycopg2
 elasticsearch
+schedule

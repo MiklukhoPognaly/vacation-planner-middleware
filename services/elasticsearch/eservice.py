@@ -3,7 +3,7 @@ import json
 from elasticsearch import Elasticsearch, helpers
 import os
 import uuid
-from credentials import ELASTICSEARCH_ENDPOINT as el
+from config import elastic_url as el
 # create a new instance of the Elasticsearch client class
 elastic = Elasticsearch(el)
 

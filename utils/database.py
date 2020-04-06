@@ -1,3 +1,4 @@
+
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy import (
@@ -15,12 +16,11 @@ eng = create_engine(
 Session = sessionmaker(bind=eng)
 session = Session()
 
-#адреса внешних каталогов
 _routes = 'http://api.travelpayouts.com/data/routes.json'
 _airports = 'http://api.travelpayouts.com/data/ru/airports.json'
 
 
-#Описание таблиц
+
 
 Base = declarative_base()
 
@@ -47,11 +47,9 @@ class IataMapping(Base):
     city_code = Column(Text)
 
 
-#Получение данных из сторонних источников
 def getDataFromServer(url):
     return [item for item in httpHelpers.getJsonData(url)]
 
-#Формирование csv файла для импорта данных
 def formCsvFileWithRoutes(filename):
     with open('./data_for_import/{}.csv'.format(filename), 'w+') as f:
         for route in getDataFromServer(_routes):
@@ -77,8 +75,6 @@ def formCsvFileWithIataMapping(filename):
                     )
 
 
-#todo: нужно сделать универсальный метод для формирования и загрузки csv в базу данных
-#Загрузка в базу данных
 def insertRoutesInDatabase():
     with open('./data_for_import/routes.csv', 'r') as f:
         eng = create_engine(
