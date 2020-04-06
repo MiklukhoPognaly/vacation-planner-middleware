@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import copy
 from mapping import mapweather, maptickets
 import json
