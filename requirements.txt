@@ -6,3 +6,5 @@ sqlalchemy
 psycopg2
 elasticsearch
 schedule
+requests_aws4auth
+boto3

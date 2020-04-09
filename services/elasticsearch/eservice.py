@@ -6,7 +6,29 @@ import os
 import uuid
 from config import elastic_url as el
 # create a new instance of the Elasticsearch client class
-elastic = Elasticsearch(el)
+
+from elasticsearch import Elasticsearch, RequestsHttpConnection
+from requests_aws4auth import AWS4Auth
+import boto3
+
+host = el # For example, my-test-domain.us-east-1.es.amazonaws.com
+region = 'ap-south-1' # e.g. us-west-1
+
+service = 'es'
+credentials = boto3.Session().get_credentials()
+awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
+
+elastic = Elasticsearch(
+    hosts=[{'host': host, 'port': 443}],
+    http_auth=awsauth,
+    use_ssl=True,
+    verify_certs=True,
+    connection_class=RequestsHttpConnection
+)
+
+
+
+
 
 
 def script_path():
@@ -233,7 +255,7 @@ if __name__ == "__main__":
                 "temperature": {"type": "long"}
             }
         }
-    Upload = PerformUpload(elastic_url='https://search-vacationplanner-pu2vusfddg2zccevu5vwkzr74y.ap-south-1.es.amazonaws.com', mapping=mapping)
+    Upload = PerformUpload(elastic_url='https://vpc-production-elasticsearch-fuc6vzlsrdejg637pq3557fgei.ap-south-1.es.amazonaws.com', mapping=mapping)
     Upload.elastic_client = elastic
     Upload\
         .perform_del_index('aviasales')\
