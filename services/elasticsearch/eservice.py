@@ -194,8 +194,24 @@ class PerformUpload:
     Клиентский класс для загрузки файлов в индекс elasticsearch
     """
     def __init__(self, elastic_url: str, mapping: dict):
+        host = el  # For example, my-test-domain.us-east-1.es.amazonaws.com
+        region = 'ap-south-1'  # e.g. us-west-1
+
+        service = 'es'
+        credentials = boto3.Session().get_credentials()
+        awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service,
+                           session_token=credentials.token)
+
+        elastic = Elasticsearch(
+            hosts=[{'host': host, 'port': 443}],
+            http_auth=awsauth,
+            use_ssl=True,
+            verify_certs=True,
+            connection_class=RequestsHttpConnection
+        )
+
         self._mapping = mapping
-        self._client = None
+        self._client = elastic
         self._base_url_elastic = elastic_url
 
     @property
@@ -219,9 +235,7 @@ class PerformUpload:
         return self
 
     def perform_upload(self, filename_path: str, index_name: str, doc_type: str):
-        if not self._client:
-            self._client = Elasticsearch(el)
-
+        print(self._client.explain)
         if self._client.indices.exists(index=index_name):
             self.perform_del_index(index_name)
 
