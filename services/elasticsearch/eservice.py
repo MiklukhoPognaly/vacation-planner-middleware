@@ -206,7 +206,7 @@ class PerformUpload:
             hosts=[{'host': host, 'port': 443}],
             http_auth=awsauth,
             use_ssl=True,
-            verify_certs=True,
+            verify_certs=False,
             connection_class=RequestsHttpConnection
         )
 
