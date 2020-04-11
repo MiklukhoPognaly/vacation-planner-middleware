@@ -20,5 +20,7 @@ es = Elasticsearch(
     connection_class=RequestsHttpConnection
 )
 
+print(es.info)
+
 for i in range(0, 50):
     print(es.get(index=elastic_index_name, doc_type=doc_type, id=i))
