@@ -6,6 +6,16 @@ import credentials
 from utils.helpers import Mdict, run_sql_file
 from abc import ABC, abstractmethod
 import config
+import logging
+
+BuilderLogger = logging.getLogger('BuilderLogger')
+BuilderLogger.setLevel(logging.INFO)
+fh = logging.FileHandler("main.log")
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+
+BuilderLogger.addHandler(fh)
 
 class Builder(ABC):
     """
@@ -72,14 +82,14 @@ class ConcreteBuilder1(Builder):
         self.reset()
         return product
 
-    def produce_part_a(self) -> None:
-        self._product.form_db_list_with_routes()
+    def produce_part_a(self) -> list:
+        return self._product.form_db_list_with_routes()
 
-    def produce_part_b(self) -> None:
-        self._product.form_list_with_cheap_ticket_flights('MOW')
+    def produce_part_b(self) -> list:
+        return self._product.form_list_with_cheap_ticket_flights('MOW')
 
-    def produce_part_c(self) -> None:
-        self._product.form_list_with_weather_info()
+    def produce_part_c(self) -> list:
+        return self._product.form_list_with_weather_info()
 
     def produce_part_d(self) -> None:
         self._product.make_file(
@@ -93,34 +103,46 @@ class Product1:
     """
 
     def __init__(self) -> None:
-        self._routes = []
-        self._flights = []
-        self._weather = []
+        self.routes = []
+        self.flights = []
+        self.weather = []
 
-    def form_db_list_with_routes(self) -> None:
-
-        # filepath = pathlib.Path.home()/'PyCharmProjects'/'vacation-planner'/'vacation_planner'/'sql'/'get_routes_moscow.sql'
+    def form_db_list_with_routes(self) -> list:
+        BuilderLogger.info('CALL -> CLASS: Product1, METHOD: form_db_list_with_routes')
         filepath = config.SQL_FILE
         rs = run_sql_file(filename=filepath, conn_sring=credentials.DATABASE_ENDPOINT)
-        for row in rs:
-            self._routes.append(row)
 
-    def form_list_with_cheap_ticket_flights(self, origin: str) -> None:
-        if self._routes:
-            for route in self._routes:
+        for row in rs:
+            self.routes.append(row)
+        BuilderLogger.info('self.routes -> %s' % str(self.routes))
+        return self.routes
+
+    def form_list_with_cheap_ticket_flights(self, origin: str) -> list:
+        BuilderLogger.info('CALL -> CLASS: Product1, METHOD: form_list_with_cheap_ticket_flights')
+        if self.routes:
+            for route in self.routes:
+                BuilderLogger.info('form_list_with_cheap_ticket_flights route:%s' % route)
                 for item in maptickets.get_cheap_prices(origin, route['arrival_iata']):
                     item.data.update(route)
-                    self._flights.append(item.data)
+                    self.flights.append(item.data)
+        BuilderLogger.info('self.flights -> %s' % str(self.flights))
+        return self.flights
 
-    def form_list_with_weather_info(self) -> None:
-        for item in self._flights:
+    def form_list_with_weather_info(self) -> list:
+        BuilderLogger.info('CALL -> CLASS: Product1, METHOD: form_list_with_weather_info')
+        for item in self.flights:
             weather_json = mapweather.weather_data(item['name']).form_json()
+            BuilderLogger.info('weather_json -> %s' % str(self.flights))
+
             aviasales_item = copy.deepcopy(item)
-            self._weather.append(Mdict(weather_json) + Mdict(aviasales_item))
+            self.weather.append(Mdict(weather_json) + Mdict(aviasales_item))
+        BuilderLogger.info('self.weather -> %s' % str(self.weather))
+        return self.weather
 
     def make_file(self, directory: str, filename: str):
+        BuilderLogger.info('CALL -> CLASS: Product1, METHOD: make_file')
         with open("{path}/{filename}".format(path=directory, filename=filename), "w+") as wf:
-            json.dump(self._weather, wf)
+            json.dump(self.weather, wf)
 
 class Director:
     """

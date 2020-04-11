@@ -135,13 +135,6 @@ class BasePricesCheap(object):
         return self.data['success']
 
 
-# http://api.travelpayouts.com/v2/prices/month-matrix?
-# currency=rub
-# &origin=LED
-# &destination=HKT
-# &show_to_affiliates=true
-# &token=РазместитеЗдесьВашТокен
-
 class BasePricesMonthMatrix(object):
     def __init__(self, raw_data):
         self.__raw_data = raw_data

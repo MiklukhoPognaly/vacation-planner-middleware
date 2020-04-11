@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
-from elasticsearch import Elasticsearch, helpers
+from elasticsearch import helpers
 import os
 import uuid
 from config import elastic_url as el
-# create a new instance of the Elasticsearch client class
+
 
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 import boto3
 
-host = el # For example, my-test-domain.us-east-1.es.amazonaws.com
-region = 'ap-south-1' # e.g. us-west-1
+host = el
+region = 'ap-south-1'
 
 service = 'es'
 credentials = boto3.Session().get_credentials()
@@ -240,6 +240,7 @@ class PerformUpload:
             self.perform_del_index(index_name)
 
         try:
+            #self._client.bulk(bulk_json_data(filename_path, index_name, doc_type))
             response = helpers.bulk(self._client, bulk_json_data(filename_path, index_name, doc_type))
             setup_mapping(index=index_name, doc_type=doc_type, body=self.mapping)
             print("\nbulk_json_data() RESPONSE:", response)

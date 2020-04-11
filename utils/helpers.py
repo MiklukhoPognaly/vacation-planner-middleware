@@ -72,52 +72,6 @@ def get_json(url) -> dict:
     return ProxyLogger(GetJson()).get_json(url)
 
 
-def datetime_formatter_method_decorator(datetime_format_string="%Y-%m-%d"):
-    def internal_function(function):
-        def wrapper(*args, **kwargs):
-            try:
-                return datetime.strptime(function(*args, **kwargs), datetime_format_string)
-            except Exception:
-                return datetime.now()
-        return wrapper
-    return internal_function
-
-
-def datetime_formatter_api_json_error_decorator(function):
-    def internal_function(*args, **kwargs):
-        res = function(*args, **kwargs)
-        try:
-            return datetime.strptime(res, "%Y-%m-%dT%H:%M:%SZ")
-        except Exception:
-            return datetime.now()
-
-    return internal_function
-
-
-def aviasales_api_json_error_decorator(function):
-    def internal_function(*args, **kwargs):
-        res = function(*args, **kwargs)
-        if isinstance(res, dict):
-            if 'errors' in res.keys() and len(res['errors']) > 0:
-                raise Exception('Data error occurred: %s ' % res['errors'])
-        else:
-            return res
-    return internal_function
-
-
-def getJsonData(url):
-    try:
-        response = requests.get(url).json()
-    except json.decoder.JSONDecodeError:
-        print(u"Проверьте правильность вызова {} в браузере, в ответе должен возвращаться json".format(url))
-        return
-    except Exception as e:
-        print(e)
-    else:
-        return response
-
-
-
 def run_sql_file(filename: any, conn_sring: str):
     """
     The function takes a filename and a connection as input
