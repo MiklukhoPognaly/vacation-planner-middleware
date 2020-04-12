@@ -2,9 +2,6 @@ from logic import tickets
 from services.elasticsearch import eservice
 import os
 import config
-import schedule
-import time
-
 
 
 if __name__ == "__main__":
@@ -22,8 +19,4 @@ if __name__ == "__main__":
                               , doc_type=config.doc_type
                               , index_name=config.elastic_index_name)
 
-
-    schedule.every(60).minutes.do(client_job)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    client_job()
