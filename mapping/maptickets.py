@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import credentials
 import requests
+from config import main_logger
 
 def get_cheap_prices(iata_town_origin, iata_town_destination):
     """
@@ -12,7 +13,7 @@ def get_cheap_prices(iata_town_origin, iata_town_destination):
 
     :return: BasePricesCheap instance
     """
-
+    main_logger.info('FUNCTION: get_cheap_prices')
     response = requests.get("http://api.travelpayouts.com/v1/prices/cheap?currency=RUB&origin={}&destination={}&token={token}"
                             .format(iata_town_origin, iata_town_destination, token=credentials.TRAVELPAYOUTS_TOKEN))\
         .json()
@@ -20,8 +21,9 @@ def get_cheap_prices(iata_town_origin, iata_town_destination):
 
         prices_object = BasePricesCheap(response, iata_town_destination).object_list
     except KeyError:
-        print(u'Нет данных для данного маршрута')
+        main_logger.error(u'Нет данных для данного маршрута')
     else:
+        main_logger.debug(prices_object)
         return prices_object
 
 

@@ -6,6 +6,7 @@ import credentials
 from utils.helpers import Mdict, run_sql_file
 from abc import ABC, abstractmethod
 import config
+from config import main_logger
 
 class Builder(ABC):
     """
@@ -98,27 +99,32 @@ class Product1:
         self._weather = []
 
     def form_db_list_with_routes(self) -> None:
-
-        # filepath = pathlib.Path.home()/'PyCharmProjects'/'vacation-planner'/'vacation_planner'/'sql'/'get_routes_moscow.sql'
+        main_logger.info('CLASS: Product1, METHOD: form_db_list_with_routes')
         filepath = config.SQL_FILE
         rs = run_sql_file(filename=filepath, conn_sring=credentials.DATABASE_ENDPOINT)
         for row in rs:
             self._routes.append(row)
+        main_logger.debug(self._routes)
 
     def form_list_with_cheap_ticket_flights(self, origin: str) -> None:
+        main_logger.info('CLASS: Product1, METHOD: form_list_with_cheap_ticket_flights ')
         if self._routes:
             for route in self._routes:
                 for item in maptickets.get_cheap_prices(origin, route['arrival_iata']):
                     item.data.update(route)
                     self._flights.append(item.data)
+        main_logger.debug(self._routes)
 
     def form_list_with_weather_info(self) -> None:
+        main_logger.info('CLASS: Product1, METHOD: form_list_with_weather_info')
         for item in self._flights:
             weather_json = mapweather.weather_data(item['name']).form_json()
             aviasales_item = copy.deepcopy(item)
             self._weather.append(Mdict(weather_json) + Mdict(aviasales_item))
+        main_logger.debug(self._weather)
 
     def make_file(self, directory: str, filename: str):
+        main_logger.info('CLASS: Product1, METHOD: make_file')
         with open("{path}/{filename}".format(path=directory, filename=filename), "w+") as wf:
             json.dump(self._weather, wf)
 

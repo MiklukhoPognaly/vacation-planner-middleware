@@ -5,6 +5,7 @@ from elasticsearch import Elasticsearch, helpers
 import os
 import uuid
 from config import elastic_url as el
+from config import main_logger
 # create a new instance of the Elasticsearch client class
 elastic = Elasticsearch(el)
 
@@ -193,22 +194,25 @@ class PerformUpload:
         self._client = client
 
     def perform_del_index(self, index_name: str):
+        main_logger.info('CLASS: PerformUpload, METHOD: perform_del_index')
         delete_index(base_url=self._base_url_elastic, old_index=index_name)
         return self
 
     def perform_upload(self, filename_path: str, index_name: str, doc_type: str):
+        main_logger.info('CLASS: PerformUpload, METHOD: perform_upload')
         if not self._client:
             self._client = Elasticsearch(el)
 
         if self._client.indices.exists(index=index_name):
+            main_logger.debug('deleting index->%s' % index_name)
             self.perform_del_index(index_name)
 
         try:
             response = helpers.bulk(self._client, bulk_json_data(filename_path, index_name, doc_type))
             setup_mapping(index=index_name, doc_type=doc_type, body=self.mapping)
-            print("\nbulk_json_data() RESPONSE:", response)
+            main_logger.info("\nbulk_json_data() RESPONSE:", response)
         except Exception as e:
-            print("\nERROR:", e)
+            main_logger.error(e)
         return self
 
 

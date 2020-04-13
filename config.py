@@ -1,8 +1,11 @@
-
-
+import logging
+import logging.config
+# ------------------------SQL---------------------------------
 SQL_FILE = './sql/get_routes_moscow.sql'
 UPLOAD_FILE = './files/Moscow'
 
+
+# ------------------------ELASTICSEARCH---------------------------------
 elastic_index_name = 'aviasales'
 elastic_data_mapping = {
     "properties": {
@@ -23,3 +26,8 @@ elastic_data_mapping = {
 }
 doc_type = 'fly_info'
 elastic_url = 'https://vpc-production-elasticsearch-fuc6vzlsrdejg637pq3557fgei.ap-south-1.es.amazonaws.com'
+
+# ------------------------LOGGING---------------------------------
+logging.config.fileConfig('logging.conf')
+main_logger = logging.getLogger('mainExample')
+
