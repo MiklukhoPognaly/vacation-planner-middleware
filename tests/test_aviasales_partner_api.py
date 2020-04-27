@@ -36,12 +36,6 @@ class TestBaseAviasalesPricesLatest(unittest.TestCase):
     def test_data_destination(self):
         assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].destination == "WRO"
 
-    def test_data_depart_date(self):
-        assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].depart_date == datetime.strptime('2015-12-07', "%Y-%m-%d")
-
-    def test_data_return_date(self):
-        assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].return_date == datetime.strptime('2015-12-13', "%Y-%m-%d")
-
     def test_data_number_of_changes(self):
         assert BasePricesLatest(self.test_data_aviasales_prices_latest).get_data()[0].number_of_changes == 0
 
@@ -112,33 +106,27 @@ class TestBasePricesCheap(unittest.TestCase):
 
     def test_data_HKT_first_departure_at(self):
         self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
-                         .get_data()[0].departure_at,
-                         datetime.strptime("2015-06-09T21:20:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+                         .get_data()[0].departure_at, '2015-06-09T21:20:00Z')
 
     def test_data_HKT_second_departure_at(self):
         self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
-                         .get_data()[1].departure_at,
-                         datetime.strptime("2015-06-05T16:40:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+                         .get_data()[1].departure_at, '2015-06-05T16:40:00Z')
 
     def test_data_HKT_first_return_at(self):
         self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
-                         .get_data()[0].return_at,
-                         datetime.strptime("2015-07-15T12:40:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+                         .get_data()[0].return_at, '2015-07-15T12:40:00Z')
 
     def test_data_HKT_second_return_at(self):
         self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
-                         .get_data()[1].return_at,
-                         datetime.strptime("2015-06-22T12:00:00Z", '%Y-%m-%dT%H:%M:%SZ'))
+                         .get_data()[1].return_at, '2015-06-22T12:00:00Z')
 
     def test_data_HKT_first_expires_at(self):
         self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
-                         .get_data()[0].expires_at,
-                         datetime.strptime("2015-01-08T18:30:40Z", '%Y-%m-%dT%H:%M:%SZ'))
+                         .get_data()[0].expires_at, '2015-01-08T18:30:40Z')
 
     def test_data_HKT_second_expires_at(self):
         self.assertEqual(BasePricesCheap(self.test_data_aviasales_prices_cheap, 'HKT')
-                         .get_data()[1].expires_at,
-                         datetime.strptime("2015-01-08T18:38:45Z", '%Y-%m-%dT%H:%M:%SZ'))
+                         .get_data()[1].expires_at, '2015-01-08T18:38:45Z')
 
 
 class TestBasePricesMonthMatrix(unittest.TestCase):
@@ -179,10 +167,7 @@ class TestBasePricesMonthMatrix(unittest.TestCase):
         self.assertEqual(self.test_object.data_list[0].destination, "HKT")
 
     def test_data_depart_date(self):
-        self.assertEqual(self.test_object.data_list[0].depart_date, datetime.strptime('2015-10-01', "%Y-%m-%d"))
-
-    def test_data_return_date(self):
-        self.assertEqual(self.test_object.data_list[0].return_date, datetime.now())
+        self.assertEqual(self.test_object.data_list[0].depart_date, '2015-10-01')
 
     def test_data_number_of_changes(self):
         self.assertEqual(self.test_object.data_list[0].number_of_changes, 1)
@@ -248,13 +233,11 @@ class TestBasePricesDirect(unittest.TestCase):
 
     def test_get_data_return_at(self):
         self.assertEqual(BasePricesDirect(self._raw_data, 'HKT')
-                         .data_list[-1].return_at,
-                         datetime.strptime("2015-06-24T20:30:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+                         .data_list[-1].return_at,'2015-06-24T20:30:00Z')
 
     def test_get_data_expires_at(self):
         self.assertEqual(BasePricesDirect(self._raw_data, 'HKT')
-                         .data_list[-1].expires_at,
-                         datetime.strptime("2015-01-08T15:17:42Z", "%Y-%m-%dT%H:%M:%SZ"))
+                         .data_list[-1].expires_at,'2015-01-08T15:17:42Z')
 
 
 class TestBasePricesCalendar(unittest.TestCase):
@@ -320,16 +303,13 @@ class TestBasePricesCalendar(unittest.TestCase):
         self.assertEqual(self.result.data_list[-1].airline, "PS")
 
     def test_data_departure_date(self):
-        self.assertEqual(self.result.data_list[-1].departure_at,
-                         datetime.strptime("2015-06-30T17:00:00Z", '%Y-%m-%dT%H:%M:%SZ'))
+        self.assertEqual(self.result.data_list[-1].departure_at, '2015-06-30T17:00:00Z')
 
     def test_data_return_at(self):
-        self.assertEqual(self.result.data_list[-1].return_at,
-                         datetime.strptime("2015-07-23T13:30:00Z", '%Y-%m-%dT%H:%M:%SZ'))
+        self.assertEqual(self.result.data_list[-1].return_at, '2015-07-23T13:30:00Z')
 
     def test_data_expires_at(self):
-        self.assertEqual(self.result.data_list[-1].expires_at,
-                         datetime.strptime("2015-01-07T20:15:34Z", '%Y-%m-%dT%H:%M:%SZ'))
+        self.assertEqual(self.result.data_list[-1].expires_at, '2015-01-07T20:15:34Z')
 
     def test_data_flight_number(self):
         self.assertEqual(self.result.data_list[-1].flight_number, 578)
@@ -377,7 +357,7 @@ class TestBasePricesNearestPlacesMatrix(unittest.TestCase):
         self.assertTrue(self.result.prices_list[0].show_to_affiliates)
 
     def test_prices_return_date(self):
-        self.assertEqual(self.result.prices_list[0].return_date, datetime.strptime('2018-09-18', '%Y-%m-%d'))
+        self.assertEqual(self.result.prices_list[0].return_date, '2018-09-18')
 
     def test_prices_origin(self):
         self.assertEqual(self.result.prices_list[0].origin, 'BAX')
@@ -389,8 +369,7 @@ class TestBasePricesNearestPlacesMatrix(unittest.TestCase):
         self.assertEqual(self.result.prices_list[0].gate, 'AMADEUS')
 
     def test_prices_found_at(self):
-        self.assertEqual(self.result.prices_list[0].found_at,
-                         datetime.strptime('2018-07-28T04:57:47Z', '%Y-%m-%dT%H:%M:%SZ'))
+        self.assertEqual(self.result.prices_list[0].found_at, '2018-07-28T04:57:47Z')
 
     def test_prices_duration(self):
         self.assertEqual(self.result.prices_list[0].duration, 'null')
@@ -402,8 +381,7 @@ class TestBasePricesNearestPlacesMatrix(unittest.TestCase):
         self.assertEqual(self.result.prices_list[0].destination, 'SIP')
 
     def test_prices_depart_date(self):
-        self.assertEqual(self.result.prices_list[0].depart_date,
-                         datetime.strptime('2018-09-09', '%Y-%m-%d'))
+        self.assertEqual(self.result.prices_list[0].depart_date, '2018-09-09')
 
     def test_prices_actual(self):
         self.assertTrue(self.result.prices_list[0].actual)

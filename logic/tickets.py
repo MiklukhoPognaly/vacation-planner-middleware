@@ -94,39 +94,53 @@ class Product1:
     """
 
     def __init__(self) -> None:
-        self._routes = []
-        self._flights = []
-        self._weather = []
+        self.routes = []
+        self.flights = []
+        self.weather = []
 
-    def form_db_list_with_routes(self) -> None:
+    def form_db_list_with_routes(self, filename=config.SQL_FILE,
+                                 conn_sring=credentials.DATABASE_ENDPOINT,
+                                 tst_res=None) -> None:
+
         main_logger.info('CLASS: Product1, METHOD: form_db_list_with_routes')
-        filepath = config.SQL_FILE
-        rs = run_sql_file(filename=filepath, conn_sring=credentials.DATABASE_ENDPOINT)
-        for row in rs:
-            self._routes.append(row)
-        main_logger.debug(self._routes)
+        #todo: make a generator from populate data function
 
-    def form_list_with_cheap_ticket_flights(self, origin: str) -> None:
+        def populate_data(sql_res):
+            for row in sql_res:
+                self.routes.append(row)
+
+        if tst_res:
+            populate_data(tst_res)
+
+        else:
+            rs = run_sql_file(filename, conn_sring)
+            populate_data(rs)
+
+        main_logger.debug(self.routes)
+
+
+    def form_list_with_cheap_ticket_flights(self, origin: str, tst_data=None) -> None:
         main_logger.info('CLASS: Product1, METHOD: form_list_with_cheap_ticket_flights ')
-        if self._routes:
-            for route in self._routes:
+
+        if self.routes:
+            for route in self.routes:
                 for item in maptickets.get_cheap_prices(origin, route['arrival_iata']):
                     item.data.update(route)
-                    self._flights.append(item.data)
-        main_logger.debug(self._routes)
+                    self.flights.append(item.data)
+        main_logger.debug(self.routes)
 
     def form_list_with_weather_info(self) -> None:
         main_logger.info('CLASS: Product1, METHOD: form_list_with_weather_info')
-        for item in self._flights:
+        for item in self.flights:
             weather_json = mapweather.weather_data(item['name']).form_json()
             aviasales_item = copy.deepcopy(item)
-            self._weather.append(Mdict(weather_json) + Mdict(aviasales_item))
-        main_logger.debug(self._weather)
+            self.weather.append(Mdict(weather_json) + Mdict(aviasales_item))
+        main_logger.debug(self.weather)
 
     def make_file(self, directory: str, filename: str):
         main_logger.info('CLASS: Product1, METHOD: make_file')
         with open("{path}/{filename}".format(path=directory, filename=filename), "w+") as wf:
-            json.dump(self._weather, wf)
+            json.dump(self.weather, wf)
 
 class Director:
     """
