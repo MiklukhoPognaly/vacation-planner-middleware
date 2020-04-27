@@ -1,14 +1,25 @@
 # Техническое описание проекта
 
+### Описание 
+
+Проект используется в качестве middleware решения для обработки и обеспечения различной логики 
+вызовов внешних API.
+
+### Установка
+
+`{{WIP}}`
+
+
 ### Структура каталогов
 * files
 * logic
 * mapping
 * services
 * sql
-* tests
-* utils
+* tests (to be updated)
+* utils (deprecated)
 * venv(deprecated)
+* корень проекта
 
 ## files
 
@@ -263,3 +274,78 @@ def create_alias(base_url, new_index, old_index):
 ```
 
 Класс `PerformUpload` является клиентским классом для загрузки файлов в индекс Elasticsearch.
+
+## sql
+
+Каталог для хранения `.sql` файлов для БД.
+
+На текущий момент находится один скрипт `get_routes_moscow` выполняющий поиск маршрутов из БД.
+```dbn-psql
+Select distinct
+  c.city_code as arrival_iata
+  ,d.name_translations as name
+  ,e.rus_name as counry_name
+  ,e.world_part
+  ,e.location
+  ,d.sea_vacation
+  ,d.ski_vacation
+from public.routes as a
+inner join
+public.iata_mapping as b
+on a.departure_airport_iata = b.code
+inner join public.iata_mapping as c
+on a.arrival_airport_iata = c.code
+inner join public.cities d
+on d.code = c.city_code
+inner join public.countries e
+on d.country_code = e.iata_2
+where b.city_code = 'MOW';
+```
+
+## корень проекта 
+
+#### client.py
+
+Главный клиентский файл, вызывающий все остальные. Лежит в корне проекта.
+
+```python
+def client_job():
+    director = tickets.Director()
+    builder = tickets.ConcreteBuilder1()
+    director.builder = builder
+    director.build_file_to_upload()
+    Upload = eservice.PerformUpload(
+            elastic_url=config.elastic_url,
+            mapping=config.elastic_data_mapping)
+    Upload.perform_upload(filename_path=os.path.join(config.UPLOAD_FILE, 'MOW_weather_tickets.json')
+                              , doc_type=config.doc_type
+                              , index_name=config.elastic_index_name)
+
+client_job()
+```
+
+#### credentials.py
+Файл в котором лежат ключи для доступа к внешним API и БД.
+
+Не лежит в общем репозитории.
+
+#### config.py
+
+Файл для хранения различных настроек проекта.
+
+Содержит переменную в которую передается инстанс главного логгера 
+```python
+logging.config.fileConfig('logging.conf')
+main_logger = logging.getLogger('mainExample')
+```
+Настройки логгера находятся в файле `logger.conf`
+
+Cодержит данные `elastic_index_name`, `elastic_data_mapping`, `doc_type`, `elastic_url` 
+для загрузки в elasticsearch
+
+Содержит данные для подключения и взаимодействия с БД.
+
+```python
+SQL_FILE = './sql/get_routes_moscow.sql'
+UPLOAD_FILE = './files/Moscow'
+```
