@@ -75,3 +75,30 @@ builder = ConcreteBuilder1()
 director.builder = builder
 director.build_file_to_upload()
 ```
+
+
+### mapping
+
+Каталог для хранения объектов выполняющих преобразование и конвертацию типов и данных из различных источнников.
+На текущий момент в каталоге находятся следующие модули:
+1. mapticket.py
+2. mapweather.py
+
+#### maptickets.py
+
+Функция `get_cheap_prices` запрашивает информацию из api `http://api.travelpayouts.com/v1/prices/cheap`
+
+```
+def get_cheap_prices(iata_town_origin, iata_town_destination) -> BasePricesCheap(response, iata_town_destination).object_list:
+```
+Класс `BasePricesLatest` выполняет обработку json получаемого посредством вызова внешнего API.
+
+Класс `BasePricesCheap` выполняет обработку json получаемого посредством вызова внешнего API.
+
+Класс `BasePricesMonthMatix` выполняет обработку json получаемого посредством вызова внешнего API.
+
+Класс `BasePricesDirect` выполняет обработку json получаемого посредством вызова внешнего API.
+
+Класс `BasePricesCalendar` выполняет обработку json получаемого посредством вызова внешнего API.
+
+Класс `BasePricesNearestPlacesMatrix` выполняет обработку json получаемого посредством вызова внешнего API.
