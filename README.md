@@ -10,11 +10,11 @@
 * utils
 * venv(deprecated)
 
-### files
+## files
 
 Каталог для хранения файлов для загрузки и индексации в elasticsearch.
 
-### logic
+## logic
 
 Каталог для хранения программных файлов, обеспечивающих хранение и обработки бизнес-логики приложения.
 
@@ -57,7 +57,7 @@
 
 В данной реализации вызывается весь сборочный путь продукта.
 
-```
+```python
 def build_file_to_upload(self) -> None: 
     self.builder.produce_part_a()
     self.builder.produce_part_b()
@@ -69,7 +69,7 @@ def build_file_to_upload(self) -> None:
 
 Сборку файла можно вызвать следующими инструкциями.
 
-```
+```python
 director = Director()
 builder = ConcreteBuilder1()
 director.builder = builder
@@ -77,7 +77,7 @@ director.build_file_to_upload()
 ```
 
 
-### mapping
+## mapping
 
 Каталог для хранения объектов выполняющих преобразование и конвертацию типов и данных из различных источнников.
 На текущий момент в каталоге находятся следующие модули:
@@ -102,3 +102,164 @@ def get_cheap_prices(iata_town_origin, iata_town_destination) -> BasePricesCheap
 Класс `BasePricesCalendar` выполняет обработку json получаемого посредством вызова внешнего API.
 
 Класс `BasePricesNearestPlacesMatrix` выполняет обработку json получаемого посредством вызова внешнего API.
+
+
+#### mapweather.py
+
+Класс `WeatherApiDataFacade` выполняет обработку json получаемого посредством вызова внешнего API.
+
+Функция `weather_data` формирует json объект на основе класса обертки `WeatherApiDataFacade`
+
+```
+def weather_data(en_city_name, url='http://api.weatherstack.com/current') -> WeatherApiDataFacade(response_json)
+```
+
+## Services
+
+Каталог для хранения логики взаимодействия с внешними сервисами.
+Содержит модуль:
+1. elasticsearch.eservice
+
+#### eservice.py
+
+Выполняется создание глобальной переменной `elastic`, в неё помещается вызов инстанса Elasticsearch driver.
+```python
+elastic = Elasticsearch(el)
+```
+
+Фукнция `script_path` возвращающая текущий каталог в файловой системе.
+```python
+def script_path():
+    path = os.path.dirname(os.path.realpath(__file__))
+    if os.name == 'posix': # posix is for macOS or Linux
+        path = path + "/"
+    else:
+        path = path + chr(92) # backslash is for Windows
+    return path
+```
+
+Функция `get_data_from_file` получает данные из файла, возвращая json объект.
+```python
+def get_data_from_file(path):
+    with open(path, encoding="utf8", errors='ignore') as wf:
+        data = wf.read()
+    return json.loads(data)
+```
+
+
+Функция `setup_mapping` определяет мэппинг данных в определенном индексе Elasticsearch.
+```python
+def setup_mapping(index, body, doc_type,):
+    elastic.indices.put_mapping(
+        index=index,
+        doc_type=doc_type,
+        body=body,
+        include_type_name=True
+    )
+```
+
+Функция `bulk_json_data` выполняющая загрузку массива документов в индекс Elasticsearch
+```python
+def bulk_json_data(json_file, _index, doc_type):
+    json_list = get_data_from_file(json_file)
+    for doc in json_list:
+        if '{"index"' not in doc:
+            yield {
+                "_index": _index,
+                "_type": doc_type,
+                "_id": uuid.uuid4(),
+                "_source": doc
+            }
+```
+
+Функция `delete_all` удаляющая все индексы и данные из Elasticsearch.
+
+**Осторожно!** При вызове функции `delete_all` произойдет удалени системных индексов, например `.kibana`.
+Лучше использовать функцию `delete_index`
+
+```python
+def delete_all(url):
+    _r = requests.delete(url)
+    return _r.text
+```
+
+Функция `display_current_mapping` возвращает мэппинг индекса.
+```python
+
+def display_current_mapping(base_url, old_index, changed_mapping):
+    r = requests.get('{base_url}/{index_name}'.format(base_url=base_url, index_name=old_index))
+    r.raise_for_status()
+    content = r.json()
+    mappings = content[old_index]['mappings']
+    mappings['properties'].update(changed_mapping)
+    return mappings
+
+```
+
+Фукнция `create_index` cоздаёт индекс в Elasticsearch
+
+```python
+
+def create_index(base_url, new_index, mappings):
+    r = requests.put('{base_url}/{index_name}'.format(base_url=base_url, index_name=new_index), json={
+        'mappings': mappings
+    })
+    r.raise_for_status()
+    return
+```
+
+Функция `perform_reindex` переименовывает индекс
+```python
+def perform_reindex(base_url, old_index, new_index):
+    r = requests.post('{base_url}/_reindex'.format(base_url=base_url), json={
+        "source": {
+            "index": old_index
+        },
+        "dest": {
+            "index": new_index
+        }
+    })
+    r.raise_for_status()
+    return
+
+```
+
+Функция `delete_index` удаляет индекс вместе с данными
+```python
+def delete_index(base_url, old_index):
+    """
+    function delete old index
+    :param base_url:
+    :param old_index:
+    :return: None
+    """
+    r = requests.delete('{base_url}/{index_name}'.format(base_url=base_url, index_name=old_index))
+    r.raise_for_status()
+    return
+
+```
+
+Функция `create_alias` создает alias для старого индекса 
+```python
+
+def create_alias(base_url, new_index, old_index):
+    """
+    Create an alias (so that on next time this will be easier to do without downtime)
+    :param base_url:
+    :param new_index:
+    :param old_index:
+    :return:
+    """
+    r = requests.post('{base_url}/_aliases'.format(base_url=base_url), json={
+        "actions": [
+            {"add": {
+                "alias": old_index,
+                "index": new_index
+            }}
+        ]
+    })
+    r.raise_for_status()
+    return
+```
+
+Класс `PerformUpload` является клиентским классом для загрузки файлов в индекс Elasticsearch.
