@@ -149,7 +149,7 @@ class TestBasePricesMonthMatrix(unittest.TestCase):
                                }
                            ]
         }
-        self.test_object = BasePricesMonthMatrix(self.test_data)
+        self.test_object = BasePricesMonthMatrix(self.test_data, '')
 
     def test_success(self):
         self.assertTrue(self.test_object.success)
