@@ -294,7 +294,7 @@ class TestBasePricesCalendar(unittest.TestCase):
         self.assertEqual(self.result.data_list[-1].destination, 'BCN')
 
     def test_data_price(self):
-        self.assertEqual(self.result.data_list[-1].price, 13025)
+        self.assertEqual(self.result.data_list[-1].price, 12449 )
 
     def test_data_transfers(self):
         self.assertEqual(self.result.data_list[-1].transfers, 1)
@@ -303,16 +303,16 @@ class TestBasePricesCalendar(unittest.TestCase):
         self.assertEqual(self.result.data_list[-1].airline, "PS")
 
     def test_data_departure_date(self):
-        self.assertEqual(self.result.data_list[-1].departure_at, '2015-06-30T17:00:00Z')
+        self.assertEqual(self.result.data_list[-1].departure_at, '2015-06-01T06:35:00Z')
 
     def test_data_return_at(self):
-        self.assertEqual(self.result.data_list[-1].return_at, '2015-07-23T13:30:00Z')
+        self.assertEqual(self.result.data_list[-1].return_at, '2015-07-01T13:30:00Z')
 
     def test_data_expires_at(self):
-        self.assertEqual(self.result.data_list[-1].expires_at, '2015-01-07T20:15:34Z')
+        self.assertEqual(self.result.data_list[-1].expires_at, '2015-01-07T12:34:14Z')
 
     def test_data_flight_number(self):
-        self.assertEqual(self.result.data_list[-1].flight_number, 578)
+        self.assertEqual(self.result.data_list[-1].flight_number, 576)
 
 
 class TestBasePricesNearestPlacesMatrix(unittest.TestCase):
