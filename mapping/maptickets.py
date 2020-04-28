@@ -241,16 +241,21 @@ class BasePricesDirect(object):
 
 
 class BasePricesCalendar(object):
-    def __init__(self, data):
+    def __init__(self, data, _):
         self.data = data
         self.success = self.get_success()
         self.data_list = self.get_data()
+        self.object_list = self.get_data()
 
     def get_success(self):
         return self.data['success']
 
     def get_data(self):
         chunk = []
+        if not self.success:
+            main_logger.error(self.data)
+            raise ValueError(self.data)
+
         for _, dictionary in self.data['data'].items():
             chunk.append(BasePricesCalendar.InternalClassObject(dictionary))
         return chunk

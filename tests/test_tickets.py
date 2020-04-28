@@ -57,14 +57,27 @@ class TestProduct1(TestCase):
 class TestUniversalGetMethod(TestCase):
     def setUp(self):
         self.destination = 'ROM'
-        self.mapping = maptickets.BasePricesCheap
+        self.mapping1 = maptickets.BasePricesCheap
+        self.mapping2 = maptickets.BasePricesCalendar
 
-    def test_false_get_info(self):
+    def test_api_method_pricescheap(self):
         _ = maptickets.get_info_from_api_with_mapping(self.destination
                                            , api='http://api.travelpayouts.com/v1/prices/cheap'
-                                           , mapping=self.mapping
+                                           , mapping=self.mapping1
                                            , url_params={'currency': 'RUB',
                                                          'origin': 'MOW',
+                                                         'destination': self.destination,
+                                                         'token': credentials.TRAVELPAYOUTS_TOKEN
+                                                         })
+        self.assertIn('price', _[0].data.keys())
+
+    def test_api_method_monthlycalender(self):
+        _ = maptickets.get_info_from_api_with_mapping(self.destination
+                                           , api='http://api.travelpayouts.com/v1/prices/calendar'
+                                           , mapping=self.mapping2
+                                           , url_params={'depart_date': '2020-04',
+                                                         'origin': "MOW",
+                                                         'calendar_type': 'departure_date',
                                                          'destination': self.destination,
                                                          'token': credentials.TRAVELPAYOUTS_TOKEN
                                                          })
