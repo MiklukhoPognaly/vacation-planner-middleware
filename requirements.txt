@@ -3,6 +3,6 @@ datefinder
 unittest2
 pytest
 sqlalchemy
-psycopg2
+psycopg2-binary
 elasticsearch
 schedule
