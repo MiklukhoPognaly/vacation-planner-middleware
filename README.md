@@ -103,7 +103,7 @@ director.build_file_to_upload()
 2. `api` - URL внешнего API без querystring
 3. `url_params` - `dict` который передается внешнему API в качестве query string.
 
-Пример вызова.
+Пример вызова c классом `BasePricesCheap`
 
 ```python
  iata_town_destination = 'ROM'
@@ -126,6 +126,29 @@ director.build_file_to_upload()
 {'price': 9299, 'airline': 'W9', 'flight_number': 8126, 'departure_at': '2020-06-02T13:25:00Z', 'return_at': '2020-06-15T21:45:00Z', 'expires_at': '2020-04-30T09:03:21Z'}
 {'price': 10854, 'airline': 'W6', 'flight_number': 2490, 'departure_at': '2020-06-01T10:05:00Z', 'return_at': '2020-06-07T16:30:00Z', 'expires_at': '2020-04-28T22:03:13Z'}
 ```
+
+Пример вызова c классом `BasePricesCheap`
+```python
+ _ = get_info_from_api_with_mapping('ROM'
+                                       , api='http://api.travelpayouts.com/v1/prices/calendar'
+                                       , mapping=BasePricesCalendar
+                                       , url_params={'depart_date': '2020-04',
+                                                                'origin': "MOW",
+                                                                'calendar_type': 'departure_date',
+                                                                'destination': 'ROM',
+                                                                'token': credentials.TRAVELPAYOUTS_TOKEN
+                                                                })
+    for i in _:
+        print(i.data)
+```
+
+Результат
+```bash
+{'origin': 'MOW', 'destination': 'ROM', 'price': 49272, 'transfers': 3, 'airline': 'SU', 'flight_number': 1214, 'departure_at': '2020-04-29T16:05:00Z', 'return_at': '2020-05-10T17:30:00Z', 'expires_at': '2020-04-29T13:05:00Z'}
+{'origin': 'MOW', 'destination': 'ROM', 'price': 27471, 'transfers': 2, 'airline': 'S7', 'flight_number': 1095, 'departure_at': '2020-04-30T13:10:00Z', 'return_at': '2020-05-16T09:30:00Z', 'expires_at': '2020-04-30T10:10:00Z'}
+
+```
+
 
 ```
 def get_cheap_prices(iata_town_origin, iata_town_destination) -> BasePricesCheap(response, iata_town_destination).object_list:
