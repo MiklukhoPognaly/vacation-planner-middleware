@@ -97,7 +97,35 @@ director.build_file_to_upload()
 
 #### maptickets.py
 
-Функция `get_cheap_prices` запрашивает информацию из api `http://api.travelpayouts.com/v1/prices/cheap`
+Универсальная функция `get_info_from_api_with_mapping` принимает набор аргументов на вход:
+
+1. `mapping` - соответсвующий класс выполняющий функцию мэппирования данных. Например `BasePricesCheap`
+2. `api` - URL внешнего API без querystring
+3. `url_params` - `dict` который передается внешнему API в качестве query string.
+
+Пример вызова.
+
+```python
+ iata_town_destination = 'ROM'
+    res = get_info_from_api_with_mapping(iata_town_destination
+                         , api='http://api.travelpayouts.com/v1/prices/cheap'
+                         , mapping=BasePricesCheap
+                         , url_params={'currency': 'RUB',
+                                       'origin': 'MOW',
+                                       'destination': iata_town_destination,
+                                       'token': credentials.TRAVELPAYOUTS_TOKEN
+                                       })
+    for mapping_object in res:
+        print(mapping_object.data)
+```
+
+Результат
+```bash
+{'price': 8360, 'airline': 'DP', 'flight_number': 933, 'departure_at': '2020-09-01T11:30:00Z', 'return_at': '2020-09-04T20:25:00Z', 'expires_at': '2020-04-30T10:38:24Z'}
+{'price': 7890, 'airline': 'U6', 'flight_number': 751, 'departure_at': '2020-09-18T11:30:00Z', 'return_at': '2020-09-20T20:25:00Z', 'expires_at': '2020-04-28T18:16:40Z'}
+{'price': 9299, 'airline': 'W9', 'flight_number': 8126, 'departure_at': '2020-06-02T13:25:00Z', 'return_at': '2020-06-15T21:45:00Z', 'expires_at': '2020-04-30T09:03:21Z'}
+{'price': 10854, 'airline': 'W6', 'flight_number': 2490, 'departure_at': '2020-06-01T10:05:00Z', 'return_at': '2020-06-07T16:30:00Z', 'expires_at': '2020-04-28T22:03:13Z'}
+```
 
 ```
 def get_cheap_prices(iata_town_origin, iata_town_destination) -> BasePricesCheap(response, iata_town_destination).object_list:
