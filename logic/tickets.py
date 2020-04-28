@@ -119,7 +119,7 @@ class Product1:
         main_logger.debug(self.routes)
 
 
-    def form_list_with_cheap_ticket_flights(self, origin: str, tst_data=None) -> None:
+    def form_list_with_cheap_ticket_flights_old(self, origin: str, tst_data=None) -> None:
         main_logger.info('CLASS: Product1, METHOD: form_list_with_cheap_ticket_flights ')
 
         if self.routes:
@@ -128,6 +128,27 @@ class Product1:
                     item.data.update(route)
                     self.flights.append(item.data)
         main_logger.debug(self.routes)
+
+    def form_list_with_cheap_ticket_flights(self, origin: str) -> None:
+        main_logger.info('CLASS: Product1, METHOD: form_list_with_cheap_ticket_flights ')
+
+        def _chunk(route_data):
+            return maptickets.get_info_from_api_with_mapping(route_data['arrival_iata']
+                                                      , api='http://api.travelpayouts.com/v1/prices/cheap'
+                                                      , mapping=maptickets.BasePricesCheap
+                                                      , url_params={'currency': 'RUB',
+                                                                    'origin': origin,
+                                                                    'destination': route_data['arrival_iata'],
+                                                                    'token': credentials.TRAVELPAYOUTS_TOKEN
+                                                                    })
+
+        if self.routes:
+            for route in self.routes:
+                for item in _chunk(route):
+                    item.data.update(route)
+                    self.flights.append(item.data)
+        main_logger.debug(self.routes)
+
 
     def form_list_with_weather_info(self) -> None:
         main_logger.info('CLASS: Product1, METHOD: form_list_with_weather_info')
