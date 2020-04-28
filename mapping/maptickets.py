@@ -139,7 +139,7 @@ class BasePricesCheap(object):
 
 
 class BasePricesMonthMatrix(object):
-    def __init__(self, raw_data):
+    def __init__(self, raw_data, _):
         self.__raw_data = raw_data
         self.data_list = self.__get_data()
         self.success = self.__get_success()
