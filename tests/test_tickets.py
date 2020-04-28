@@ -1,7 +1,6 @@
 from logic import tickets
 from unittest import TestCase
 from mapping import maptickets
-import unittest
 import credentials
 
 cheap_test_data = {
@@ -53,7 +52,7 @@ class TestProduct1(TestCase):
         self.Product1.routes = [{"arrival_iata": "ROM"}]
         self.Product1.form_list_with_cheap_ticket_flights('MOW')
         self.assertIn('price', self.Product1.flights[0])
-        
+
 
 class TestUniversalGetMethod(TestCase):
     def setUp(self):

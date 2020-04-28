@@ -119,16 +119,6 @@ class Product1:
         main_logger.debug(self.routes)
 
 
-    def form_list_with_cheap_ticket_flights_old(self, origin: str, tst_data=None) -> None:
-        main_logger.info('CLASS: Product1, METHOD: form_list_with_cheap_ticket_flights ')
-
-        if self.routes:
-            for route in self.routes:
-                for item in maptickets.get_cheap_prices(origin, route['arrival_iata']):
-                    item.data.update(route)
-                    self.flights.append(item.data)
-        main_logger.debug(self.routes)
-
     def form_list_with_cheap_ticket_flights(self, origin: str) -> None:
         main_logger.info('CLASS: Product1, METHOD: form_list_with_cheap_ticket_flights ')
 

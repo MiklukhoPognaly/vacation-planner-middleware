@@ -1,34 +1,12 @@
 # -*- coding: utf-8 -*-
 import credentials
 import requests
-#from config import main_logger
-
-def get_cheap_prices(iata_town_origin, iata_town_destination):
-    """
-    Retrieves information from http://api.travelpayouts.com/v1/prices/cheap
-
-    :param iata_town_origin:
-
-    :param iata_town_destination:
-
-    :return: BasePricesCheap instance
-    """
-    #main_logger.info('FUNCTION: get_cheap_prices')
-    response = requests.get("http://api.travelpayouts.com/v1/prices/cheap?currency=RUB&origin={}&destination={}&token={token}"
-                            .format(iata_town_origin, iata_town_destination, token=credentials.TRAVELPAYOUTS_TOKEN))\
-        .json()
-    try:
-
-        prices_object = BasePricesCheap(response, iata_town_destination).object_list
-    except KeyError:
-        print(u'Нет данных для данного маршрута')
-        #main_logger.error(u'Нет данных для данного маршрута')
-    else:
-        #main_logger.debug(prices_object)
-        return prices_object
+from config import main_logger
 
 
 def get_info_from_api_with_mapping(*args, **kwargs):
+    main_logger.info('FUNCTION: get_info_from_api_with_mapping')
+
     _keys = {'mapping', 'api', 'url_params'}
     if not {'mapping', 'api', 'url_params'}.issubset(set(kwargs.keys())):
         raise KeyError('This function should have %s keys' % str(_keys))
@@ -42,15 +20,12 @@ def get_info_from_api_with_mapping(*args, **kwargs):
 
     try:
         result_object = _mapping_class(json, *args).object_list
-        #main_logger.debug(result_object)
+        main_logger.debug(result_object)
         return result_object
 
     except KeyError:
-        #main_logger.error(u'Нет данных для данного маршрута')
+        main_logger.error(u'Нет данных для данного маршрута')
         return
-
-
-
 
 
 class BasePricesLatest(object):
