@@ -2,7 +2,7 @@ from logic import tickets
 from unittest import TestCase
 from mapping import maptickets
 import unittest
-
+import credentials
 
 cheap_test_data = {
                                    "success": True,
@@ -49,5 +49,24 @@ class TestProduct1(TestCase):
         self.assertEqual(self.Product1.routes, [{'arrival_iata': 'TEST1'}, {'arrival_iata': 'TEST2'}])
 
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_form_list_with_cheap_ticket_flights(self):
+        self.Product1.routes = [{"arrival_iata": "ROM"}]
+        self.Product1.form_list_with_cheap_ticket_flights('MOW')
+        self.assertIn('price', self.Product1.flights[0])
+        
+
+class TestUniversalGetMethod(TestCase):
+    def setUp(self):
+        self.destination = 'ROM'
+        self.mapping = maptickets.BasePricesCheap
+
+    def test_false_get_info(self):
+        _ = maptickets.get_info_from_api_with_mapping(self.destination
+                                           , api='http://api.travelpayouts.com/v1/prices/cheap'
+                                           , mapping=self.mapping
+                                           , url_params={'currency': 'RUB',
+                                                         'origin': 'MOW',
+                                                         'destination': self.destination,
+                                                         'token': credentials.TRAVELPAYOUTS_TOKEN
+                                                         })
+        self.assertIn('price', _[0].data.keys())

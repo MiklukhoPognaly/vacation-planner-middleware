@@ -28,11 +28,10 @@ def get_cheap_prices(iata_town_origin, iata_town_destination):
         return prices_object
 
 
-def get_cheap_prices_new(*args, **kwargs):
-
-    if 'mapping' or 'api' not in kwargs.keys:
-        print('mapping or api keys are not in kwargs')
-        #main_logger.error('mapping or api keys are not in kwargs')
+def get_info_from_api_with_mapping(*args, **kwargs):
+    _keys = {'mapping', 'api', 'url_params'}
+    if not {'mapping', 'api', 'url_params'}.issubset(set(kwargs.keys())):
+        raise KeyError('This function should have %s keys' % str(_keys))
 
     _mapping_class = kwargs['mapping']
     _api_url = kwargs['api']
@@ -392,7 +391,7 @@ class BasePricesNearestPlacesMatrix(object):
 
 if __name__ == "__main__":
     iata_town_destination = 'ROM'
-    _ = get_cheap_prices_new(iata_town_destination
+    _ = get_info_from_api_with_mapping(iata_town_destination
                          , api='http://api.travelpayouts.com/v1/prices/cheap'
                          , mapping=BasePricesCheap
                          , url_params={'currency': 'RUB',
