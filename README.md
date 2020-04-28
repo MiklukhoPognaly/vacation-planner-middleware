@@ -127,7 +127,7 @@ director.build_file_to_upload()
 {'price': 10854, 'airline': 'W6', 'flight_number': 2490, 'departure_at': '2020-06-01T10:05:00Z', 'return_at': '2020-06-07T16:30:00Z', 'expires_at': '2020-04-28T22:03:13Z'}
 ```
 
-Пример вызова c классом `BasePricesCheap`
+Пример вызова c классом `BasePricesCalendar`
 ```python
  _ = get_info_from_api_with_mapping('ROM'
                                        , api='http://api.travelpayouts.com/v1/prices/calendar'
