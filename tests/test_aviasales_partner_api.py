@@ -282,7 +282,7 @@ class TestBasePricesCalendar(unittest.TestCase):
            }
         }
 
-        self.result = BasePricesCalendar(self.data)
+        self.result = BasePricesCalendar(self.data, '')
 
     def test_success(self):
         self.assertTrue(self.result.success)
