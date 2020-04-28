@@ -1,4 +1,4 @@
-import unittest2 as unittest
+import unittest
 from datetime import datetime
 from mapping.maptickets import BasePricesLatest, BasePricesCheap\
     , BasePricesMonthMatrix, BasePricesDirect, BasePricesCalendar, BasePricesNearestPlacesMatrix

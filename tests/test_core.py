@@ -1,6 +1,6 @@
-# coding=utf-8
-import unittest2
-from datetime import datetime
+
+import unittest
+
 
 import utils.helpers
 
@@ -70,7 +70,7 @@ test_best_prices_data = {
 
 
 
-class TestErrorDecorator(unittest2.TestCase):
+class TestErrorDecorator(unittest.TestCase):
     def test_error_http(self):
         with self.assertRaises(Exception):
             utils.http_requests.get_json_raw('http://min-prices.aviasales.ru/calendar_preload',
