@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import credentials
 import requests
-from config import main_logger
+#from config import main_logger
 
 def get_cheap_prices(iata_town_origin, iata_town_destination):
     """
@@ -13,7 +13,7 @@ def get_cheap_prices(iata_town_origin, iata_town_destination):
 
     :return: BasePricesCheap instance
     """
-    main_logger.info('FUNCTION: get_cheap_prices')
+    #main_logger.info('FUNCTION: get_cheap_prices')
     response = requests.get("http://api.travelpayouts.com/v1/prices/cheap?currency=RUB&origin={}&destination={}&token={token}"
                             .format(iata_town_origin, iata_town_destination, token=credentials.TRAVELPAYOUTS_TOKEN))\
         .json()
@@ -21,10 +21,37 @@ def get_cheap_prices(iata_town_origin, iata_town_destination):
 
         prices_object = BasePricesCheap(response, iata_town_destination).object_list
     except KeyError:
-        main_logger.error(u'Нет данных для данного маршрута')
+        print(u'Нет данных для данного маршрута')
+        #main_logger.error(u'Нет данных для данного маршрута')
     else:
-        main_logger.debug(prices_object)
+        #main_logger.debug(prices_object)
         return prices_object
+
+
+def get_cheap_prices_new(*args, **kwargs):
+
+    if 'mapping' or 'api' not in kwargs.keys:
+        print('mapping or api keys are not in kwargs')
+        #main_logger.error('mapping or api keys are not in kwargs')
+
+    _mapping_class = kwargs['mapping']
+    _api_url = kwargs['api']
+
+    _querystring = kwargs['url_params']
+
+    json = requests.get(_api_url, params=_querystring).json()
+
+    try:
+        result_object = _mapping_class(json, *args).object_list
+        #main_logger.debug(result_object)
+        return result_object
+
+    except KeyError:
+        #main_logger.error(u'Нет данных для данного маршрута')
+        return
+
+
+
 
 
 class BasePricesLatest(object):
@@ -364,5 +391,14 @@ class BasePricesNearestPlacesMatrix(object):
 
 
 if __name__ == "__main__":
-    for i in get_cheap_prices('MOW', 'LED'):
+    iata_town_destination = 'ROM'
+    _ = get_cheap_prices_new(iata_town_destination
+                         , api='http://api.travelpayouts.com/v1/prices/cheap'
+                         , mapping=BasePricesCheap
+                         , url_params={'currency': 'RUB',
+                                       'origin': 'MOW',
+                                       'destination': iata_town_destination,
+                                       'token': credentials.TRAVELPAYOUTS_TOKEN
+                                       })
+    for i in _:
         print(i.data)
