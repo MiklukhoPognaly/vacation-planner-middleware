@@ -129,7 +129,7 @@ class BasePricesCheap(object):
         chunk = []
         if self.data['data'] is None:
             raise KeyError
-        if len(self.data['data'])> 0:
+        if len(self.data['data']) > 0:
             for _, raw_data in self.data['data'][self.city_iata].items():
                 chunk.append(BasePricesCheap.InternalClassObject(raw_data))
         return chunk
@@ -256,8 +256,12 @@ class BasePricesCalendar(object):
             main_logger.error(self.data)
             raise ValueError(self.data)
 
-        for _, dictionary in self.data['data'].items():
-            chunk.append(BasePricesCalendar.InternalClassObject(dictionary))
+        if len(self.data['data']) > 0:
+            for _, dictionary in self.data['data'].items():
+                chunk.append(BasePricesCalendar.InternalClassObject(dictionary))
+        else:
+            main_logger.warning('Нет данных - %s' % str(self.data))
+
         return chunk
 
     class InternalClassObject(object):

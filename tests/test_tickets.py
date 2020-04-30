@@ -56,7 +56,7 @@ class TestProduct1(TestCase):
 
 class TestUniversalGetMethod(TestCase):
     def setUp(self):
-        self.destination = 'ROM'
+        self.destination = 'KGD'
         self.mapping1 = maptickets.BasePricesCheap
         self.mapping2 = maptickets.BasePricesCalendar
 
