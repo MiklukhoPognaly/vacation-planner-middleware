@@ -99,7 +99,8 @@ class Product1:
         self.weather = []
 
     def form_db_list_with_routes(self, filename=config.SQL_FILE,
-                                 conn_sring=credentials.DATABASE_ENDPOINT,
+                                 conn_sring='postgres://{user}:{password}@vacation-planner-library.ciodtn8hce9y.ap-south-1.rds.amazonaws.com:5432/postgres'
+                                 .format(user=credentials.DB_LOGIN, password=credentials.DB_PASSWORD),
                                  tst_res=None) -> None:
 
         main_logger.info('CLASS: Product1, METHOD: form_db_list_with_routes')
